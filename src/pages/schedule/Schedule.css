@@ -1,0 +1,23 @@
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.schedule-table th, .schedule-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    vertical-align: center;
+}
+
+.schedule-table th {
+    background-color: #f4f4f4;
+}
+
+.schedule-table td {
+    height: 60px;
+}
+
+/* .schedule-table th:first-child, .schedule-table td:first-child {
+    width: 120px;
+} */
