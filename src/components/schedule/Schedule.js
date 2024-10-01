@@ -1,41 +1,7 @@
 import React from "react";
 import "./Schedule.css"; // Importa el archivo CSS
 
-const Schedule = () => {
-  const schedule = {
-    lunes: {
-      "ramo 1": {
-        tipo: "Clase",
-        sala: "101",
-        hora_inicio: "08:30",
-        hora_termino: "10:20",
-      },
-      "ramo 2": {
-        tipo: "Laboratorio",
-        sala: "Lab",
-        hora_inicio: "10:30",
-        hora_termino: "12:20",
-      },
-    },
-    martes: {
-      "ramo 1": {
-        tipo: "Clase",
-        sala: "010",
-        hora_inicio: "09:00",
-        hora_termino: "10:30",
-      },
-      "ramo 2": {
-        tipo: "Práctica",
-        sala: "012",
-        hora_inicio: "11:00",
-        hora_termino: "12:30",
-      },
-    },
-    miercoles: {},
-    jueves: {},
-    viernes: {},
-  };
-
+const Schedule = ({ schedule }) => {
   // Crear una matriz de horarios
   const timeSlots = [
     { start: "08:30", end: "09:20" },
@@ -133,7 +99,6 @@ const Schedule = () => {
 
   return (
     <div>
-      <h2>Horario</h2>
       {renderSchedule()}
     </div>
   );
