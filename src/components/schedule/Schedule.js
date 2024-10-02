@@ -19,6 +19,18 @@ const Schedule = ({ schedule }) => {
     { start: "20:30", end: "21:20" },
   ];
 
+  // Definimos las clases numéricas para los cursos
+  const courseClassMapping = {};
+
+  // Función que asigna un número único a cada curso
+  const getCourseClass = (courseName) => {
+    if (!courseClassMapping[courseName]) {
+      const nextClassNumber = Object.keys(courseClassMapping).length + 1;
+      courseClassMapping[courseName] = `course course-${nextClassNumber}`;
+    }
+    return courseClassMapping[courseName];
+  };
+
   const renderSchedule = () => {
     return (
       <table className="schedule-table">
@@ -51,37 +63,38 @@ const Schedule = ({ schedule }) => {
   };
 
   const renderCourseInfo = (daySchedule, slot) => {
-    // Iteramos sobre todos los ramos del día
-    const courses = Object.entries(daySchedule).filter(
-      ([courseName, details]) => {
-        // Verificamos si el curso está dentro del bloque de tiempo actual
-        return isTimeWithinSlot(
-          details.hora_inicio,
-          details.hora_termino,
-          slot.start,
-          slot.end
-        );
-      }
+    const courses = Object.entries(daySchedule).filter(([, details]) =>
+      isTimeWithinSlot(
+        details.hora_inicio,
+        details.hora_termino,
+        slot.start,
+        slot.end
+      )
     );
 
-    // Si no hay cursos en este bloque, devolvemos una celda vacía
     if (courses.length === 0) {
-      return ""; // Devolvemos una cadena vacía para celdas sin clase
+      return ""; // No hay cursos en este bloque de tiempo
     }
 
-    // Si hay cursos, los mostramos con el formato requerido
-    return courses.map(([courseName, details]) => (
-      <div key={courseName}>
-        <strong>{courseName}</strong>
-        <br />
-        Sala: {details.sala}
-        <br />
-        {details.tipo}
-      </div>
-    ));
+    const overlappingCourses = findOverlappingCourses(courses);
+
+    return courses.map(([courseName, details]) => {
+      const isOverlapping = overlappingCourses.includes(courseName);
+      const courseClass = getCourseClass(courseName);
+
+      return (
+        <div
+          key={courseName}
+          className={`${courseClass} ${isOverlapping ? "conflict" : ""}`}
+        >
+          <div className="course-name">{courseName}</div>
+          <div className="course-sala">Sala: {details.sala}</div>
+          <div className="course-tipo">{details.tipo}</div>
+        </div>
+      );
+    });
   };
 
-  // Verifica si el curso cae dentro del bloque de tiempo
   const isTimeWithinSlot = (startTime, endTime, slotStart, slotEnd) => {
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
@@ -93,15 +106,45 @@ const Schedule = ({ schedule }) => {
     const slotStartMin = slotStartHour * 60 + slotStartMinute;
     const slotEndMin = slotEndHour * 60 + slotEndMinute;
 
-    // Retorna true si el curso empieza o termina dentro del intervalo de tiempo
     return courseStart < slotEndMin && courseEnd > slotStartMin;
   };
 
-  return (
-    <div>
-      {renderSchedule()}
-    </div>
-  );
+  const findOverlappingCourses = (courses) => {
+    const overlapping = [];
+    for (let i = 0; i < courses.length; i++) {
+      const [courseName1, details1] = courses[i];
+      for (let j = i + 1; j < courses.length; j++) {
+        const [courseName2, details2] = courses[j];
+        if (
+          isTimeOverlap(
+            details1.hora_inicio,
+            details1.hora_termino,
+            details2.hora_inicio,
+            details2.hora_termino
+          )
+        ) {
+          overlapping.push(courseName1, courseName2);
+        }
+      }
+    }
+    return overlapping;
+  };
+
+  const isTimeOverlap = (start1, end1, start2, end2) => {
+    const [startHour1, startMinute1] = start1.split(":").map(Number);
+    const [endHour1, endMinute1] = end1.split(":").map(Number);
+    const [startHour2, startMinute2] = start2.split(":").map(Number);
+    const [endHour2, endMinute2] = end2.split(":").map(Number);
+
+    const start1Min = startHour1 * 60 + startMinute1;
+    const end1Min = endHour1 * 60 + endMinute1;
+    const start2Min = startHour2 * 60 + startMinute2;
+    const end2Min = endHour2 * 60 + endMinute2;
+
+    return start1Min < end2Min && start2Min < end1Min;
+  };
+
+  return <div>{renderSchedule()}</div>;
 };
 
 export default Schedule;

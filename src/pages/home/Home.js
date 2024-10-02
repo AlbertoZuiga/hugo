@@ -1,45 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Schedule from "../../components/schedule/Schedule";
-import "./Home.css"
+import "./Home.css";
 
 const Home = () => {
-  const schedule = {
-    lunes: {
-      "ramo 1": {
-        tipo: "Clase",
-        sala: "101",
-        hora_inicio: "08:30",
-        hora_termino: "10:20",
-      },
-      "ramo 2": {
-        tipo: "Laboratorio",
-        sala: "Lab",
-        hora_inicio: "10:30",
-        hora_termino: "12:20",
-      },
-    },
-    martes: {
-      "ramo 1": {
-        tipo: "Clase",
-        sala: "010",
-        hora_inicio: "09:00",
-        hora_termino: "10:30",
-      },
-      "ramo 2": {
-        tipo: "Práctica",
-        sala: "012",
-        hora_inicio: "11:30",
-        hora_termino: "13:30",
-      },
-    },
-    miercoles: {},
-    jueves: {},
-    viernes: {},
-  };
+  // Estado para almacenar el horario obtenido de la API
+  const [schedule, setSchedule] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Función para obtener los horarios desde el backend
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/schedules");
+        setSchedule(response.data[0]);  // Dado que schedules es una lista, accedemos al primer elemento
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching the schedule:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!schedule) {
+    return <div>Error loading schedule</div>;
+  }
 
   return (
     <div>
-        <h1>Welcome to the Home Page</h1>
+      <h1>Welcome to the Home Page</h1>
       <Schedule schedule={schedule} />
     </div>
   );

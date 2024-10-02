@@ -1,23 +1,96 @@
 .schedule-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.schedule-table th, .schedule-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-    vertical-align: center;
+.schedule-table th,
+.schedule-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
 }
 
 .schedule-table th {
-    background-color: #f4f4f4;
+  background-color: #f4f4f4;
 }
 
 .schedule-table td {
-    height: 60px;
+  height: 60px;
 }
 
-/* .schedule-table th:first-child, .schedule-table td:first-child {
-    width: 120px;
-} */
+.schedule-table th:first-child,
+.schedule-table td:first-child {
+  width: 120px;
+}
+
+/* Definir colores predefinidos para los cursos */
+.course-1 {
+  background-color: #ffcc80; /* Naranja claro */
+  color: #000;
+}
+
+.course-2 {
+  background-color: #90caf9; /* Azul claro */
+  color: #000;
+}
+
+.course-3 {
+  background-color: #a5d6a7; /* Verde claro */
+  color: #000;
+}
+
+.course-4 {
+  background-color: #ffab91; /* Salmón claro */
+  color: #000;
+}
+
+.course-5 {
+  background-color: #e6ee9c; /* Amarillo claro */
+  color: #000;
+}
+
+.course-6 {
+  background-color: #ce93d8; /* Morado claro */
+  color: #000;
+}
+
+.course-7 {
+  background-color: #ffab40; /* Naranja oscuro */
+  color: #000;
+}
+
+.course-8 {
+  background-color: #64b5f6; /* Azul medio */
+  color: #000;
+}
+
+.course-9 {
+  background-color: #4db6ac; /* Verde agua */
+  color: #000;
+}
+
+.course {
+  display: flex;
+  flex-direction: column; /* Cambiar a columna para apilar los elementos */
+  justify-content: center; /* Centrar verticalmente */
+  align-items: center; /* Centrar horizontalmente */
+  height: 100%; /* Asegura que ocupe toda la altura disponible */
+  text-align: center; /* Asegura que el texto esté centrado */
+  padding: 5px; /* Un poco de padding para separar el texto del borde */
+  box-sizing: border-box; /* Asegura que padding no afecte el tamaño total */
+}
+
+.course-name {
+  font-weight: bold; /* Nombre del curso en negrita */
+}
+
+.course-sala,
+.course-tipo {
+  margin-top: 5px; /* Espaciado entre los elementos */
+}
+
+/* Clase para marcar conflictos */
+.conflict {
+  border: 2px solid red;
+  height: 50%;
+}
