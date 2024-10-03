@@ -93,3 +93,26 @@ schedules = [
 @app.get("/schedules", response_model=List[Dict[str, Dict[str, Dict[str, str]]]])
 async def get_schedules():
     return schedules
+
+
+courses = [
+  {"title": "Circuitos Eléctricos", "teacher": "Profesor Gómez", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
+  {"title": "Electromagnetismo", "teacher": "Profesor López", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Comunicaciones"},
+  {"title": "Máquinas Eléctricas", "teacher": "Profesor Silva", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Automatización"},
+  {"title": "Mecánica de Suelos", "teacher": "Profesora Martínez", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Geotécnica"},
+  {"title": "Diseño Estructural", "teacher": "Profesor Pérez", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Estructuras"},
+  {"title": "Hidráulica de Canales", "teacher": "Profesora Vargas", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Hidráulica"},
+  {"title": "Algoritmos y Estructuras de Datos", "teacher": "Profesor Sánchez", "area": "Computación", "mayor": "Ciencias de la Computación", "minor": "Desarrollo de Software"},
+  {"title": "Sistemas Operativos", "teacher": "Profesora Díaz", "area": "Computación", "mayor": "Ciencias de la Computación", "minor": "Administración de Sistemas"},
+  {"title": "Inteligencia Artificial", "teacher": "Profesor Fernández", "area": "Computación", "mayor": "Ciencias de la Computación", "minor": "Aprendizaje Automático"},
+  {"title": "Gestión de Operaciones", "teacher": "Profesora Rojas", "area": "Industrial", "mayor": "Ingeniería Industrial", "minor": "Optimización"},
+  {"title": "Ingeniería Económica", "teacher": "Profesor Castillo", "area": "Industrial", "mayor": "Ingeniería Industrial", "minor": "Economía de Empresas"},
+  {"title": "Gestión de Proyectos", "teacher": "Profesora Hernández", "area": "Industrial", "mayor": "Ingeniería Industrial", "minor": "Project Management"},
+  {"title": "Sistemas de Gestión Ambiental", "teacher": "Profesor Ortega", "area": "Ambiental", "mayor": "Ingeniería Ambiental", "minor": "Sostenibilidad"},
+  {"title": "Tratamiento de Aguas", "teacher": "Profesora Morales", "area": "Ambiental", "mayor": "Ingeniería Ambiental", "minor": "Recursos Hídricos"},
+  {"title": "Evaluación de Impacto Ambiental", "teacher": "Profesor Ibáñez", "area": "Ambiental", "mayor": "Ingeniería Ambiental", "minor": "Legislación Ambiental"}
+]
+
+@app.get("/courses", response_model=List[Dict[str, str]])
+async def get_courses():
+    return courses
