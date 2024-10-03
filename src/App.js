@@ -4,6 +4,7 @@ import Navbar from './components/navbar/Navbar';
 import Footer from './components/footer/Footer';
 import Home from './pages/home/Home';
 import SearchCourses from './pages/search_courses/SearchCourses';
+import SchedulePreferences from './components/schedule_preferences/SchedulePreferences';
 
 const App = () => {
     return (
@@ -14,6 +15,7 @@ const App = () => {
                     <Routes>
                         <Route path="/" element={<Home />} /> 
                         <Route path="/search-courses" element={<SearchCourses />} />
+                        <Route path="/schedule-preferences" element={<SchedulePreferences />} />
                     </Routes>
                 </main>
                 <Footer />

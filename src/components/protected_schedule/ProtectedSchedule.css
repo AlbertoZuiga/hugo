@@ -1,0 +1,51 @@
+/* ProtectedSchedule.css */
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.schedule-table th, .schedule-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center; /* Centramos el texto en las celdas */
+  transition: background-color 0.3s; /* Transición suave para el cambio de color */
+}
+
+.schedule-table th {
+  background-color: #f2f2f2;
+}
+
+.schedule-table td.time-column {
+  background-color: #e0e0e0; /* Color de fondo para la columna de horas */
+  font-weight: bold; /* Negrita para destacar la columna de horas */
+}
+
+.schedule-table td.day-cell {
+  cursor: pointer;
+  background-color: #4CAF50;
+}
+
+.schedule-table td.day-cell.selected {
+  background-color: #4CAF50; /* Color cuando está seleccionado */
+}
+
+.schedule-table td.day-cell:not(.selected):hover {
+  background-color: #c8e6c9; /* Color verde claro para el hover */
+}
+
+.schedule-table td.day-cell {
+  background-color: #f9f9f9; /* Color de fondo por defecto para las celdas de los días */
+}
+
+.protected-schedule h1 {
+  text-align: center;
+}
+
+.checkbox-label {
+  display: block;
+  position: relative;
+}
+
+.hidden-checkbox {
+  display: none;
+}
