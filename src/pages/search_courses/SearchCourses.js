@@ -8,6 +8,10 @@ const SearchCourses = () => {
   const [selectedCourses, setSelectedCourses] = useState([]); // Ramos seleccionados
   const [loading, setLoading] = useState(true); // Estado de carga
   const [showSelectedCourses, setShowSelectedCourses] = useState(false); // Toggle para mostrar lista seleccionada
+  const [selectedArea, setSelectedArea] = useState(''); // Estado para el área seleccionada
+  const [selectedMajor, setSelectedMajor] = useState(''); // Estado para el major seleccionado
+  const [selectedMinor, setSelectedMinor] = useState(''); // Estado para el minor seleccionado
+  const [professorSearchTerm, setProfessorSearchTerm] = useState(''); // Término de búsqueda para el profesor
 
   // Obtener la lista de ramos del backend
   useEffect(() => {
@@ -53,9 +57,15 @@ const SearchCourses = () => {
     return Object.values(grouped); // Devolver los ramos agrupados
   };
 
-  // Filtrar ramos según el término de búsqueda
+  // Filtrar ramos según los filtros aplicados
   const filteredCourses = groupCoursesByTitle(normalizeCourseTeachers(courses)).filter((course) =>
-    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+    course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (selectedArea === '' || course.area === selectedArea) &&
+    (selectedMajor === '' || course.mayor === selectedMajor) &&
+    (selectedMinor === '' || course.minor === selectedMinor) &&
+    (professorSearchTerm === '' || course.teachers.some((teacher) =>
+      teacher.toLowerCase().includes(professorSearchTerm.toLowerCase())
+    ))
   );
 
   // Manejar selección y deselección de ramos
@@ -69,9 +79,29 @@ const SearchCourses = () => {
     }
   };
 
-  // Manejar la búsqueda
+  // Manejar la búsqueda por título del curso
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  // Manejar el cambio de área
+  const handleAreaChange = (event) => {
+    setSelectedArea(event.target.value);
+  };
+
+  // Manejar el cambio de mayor
+  const handleMajorChange = (event) => {
+    setSelectedMajor(event.target.value);
+  };
+
+  // Manejar el cambio de minor
+  const handleMinorChange = (event) => {
+    setSelectedMinor(event.target.value);
+  };
+
+  // Manejar la búsqueda por nombre del profesor
+  const handleProfessorSearchChange = (event) => {
+    setProfessorSearchTerm(event.target.value);
   };
 
   // Toggle para cambiar entre mostrar la lista de todos los ramos o los ramos seleccionados
@@ -83,25 +113,73 @@ const SearchCourses = () => {
     return <div>Loading...</div>;
   }
 
+  // Obtener una lista única de áreas, majors, minors y profesores para los dropdowns y el filtro de profesores
+  const areas = [...new Set(courses.map(course => course.area))];
+  const majors = [...new Set(courses.map(course => course.mayor))];
+  const minors = [...new Set(courses.map(course => course.minor))];
+  const allProfessors = [...new Set(courses.flatMap(course => course.teachers))];
+
   return (
     <div className="course-selection">
       <h1>Buscar y Seleccionar Ramos</h1>
 
+      {/* Barra de búsqueda general por título */}
+      <input
+        type="text"
+        placeholder="Buscar ramo..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        className="search-bar"
+      />
+
+      {/* Contenedor para filtros */}
+      <div className="filters">
+        {/* Filtro por área */}
+        <select value={selectedArea} onChange={handleAreaChange} className="area-filter">
+          <option value="">Todas las Áreas</option>
+          {areas.map((area, index) => (
+            <option key={index} value={area}>
+              {area}
+            </option>
+          ))}
+        </select>
+
+        {/* Filtro por mayor */}
+        <select value={selectedMajor} onChange={handleMajorChange} className="major-filter">
+          <option value="">Todos los Mayors</option>
+          {majors.map((major, index) => (
+            <option key={index} value={major}>
+              {major}
+            </option>
+          ))}
+        </select>
+
+        {/* Filtro por minor */}
+        <select value={selectedMinor} onChange={handleMinorChange} className="minor-filter">
+          <option value="">Todos los Minors</option>
+          {minors.map((minor, index) => (
+            <option key={index} value={minor}>
+              {minor}
+            </option>
+          ))}
+        </select>
+
+        {/* Filtro por profesor */}
+        <div className="professor-filter">
+          <input
+            type="text"
+            placeholder="Buscar profesor..."
+            value={professorSearchTerm}
+            onChange={handleProfessorSearchChange}
+            className="search-bar"
+          />
+        </div>
+      </div>
+
       {/* Toggle para cambiar entre las listas */}
-      <button onClick={toggleView}>
+      <button onClick={toggleView} className="toggle-button">
         {showSelectedCourses ? 'Ver Todos los Ramos' : 'Ver Ramos Seleccionados'}
       </button>
-
-      {/* Mostrar barra de búsqueda si estamos en la vista de todos los ramos */}
-      {!showSelectedCourses && (
-        <input
-          type="text"
-          placeholder="Buscar ramo..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="search-bar"
-        />
-      )}
 
       {/* Mostrar ramos filtrados o ramos seleccionados, según el estado del toggle */}
       {showSelectedCourses ? (
@@ -111,7 +189,6 @@ const SearchCourses = () => {
             selectedCourses.map((course, index) => (
               <div key={index} className="selected-course-item">
                 <h3>{course.title}</h3>
-                {/* Mostrar lista de todos los profesores */}
                 <p>Profesores:</p>
                 {course.teachers.map((prof, idx) => (
                   <p key={idx}>{prof}</p>
@@ -136,7 +213,6 @@ const SearchCourses = () => {
               onClick={() => handleCourseClick(course)}
             >
               <h3>{course.title}</h3>
-              {/* No mostrar el nombre del profesor en esta lista */}
               <p>Área: {course.area}</p>
               <p>Mayor: {course.mayor}</p>
               <p>Minor: {course.minor}</p>
