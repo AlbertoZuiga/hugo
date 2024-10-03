@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict, List
+from typing import Dict, List, Union
 
 app = FastAPI()
 
@@ -97,7 +97,11 @@ async def get_schedules():
 
 courses = [
   {"title": "Circuitos Eléctricos", "teacher": "Profesor Gómez", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
-  {"title": "Electromagnetismo", "teacher": "Profesor López", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Comunicaciones"},
+  {"title": "Circuitos Eléctricos", "teacher": "Profesor w", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
+  {"title": "Circuitos Eléctricos", "teacher": "Profesor x", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
+  {"title": "Circuitos Eléctricos", "teacher": "Profesor y", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
+  {"title": "Circuitos Eléctricos", "teacher": "Profesor z", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
+  {"title": "Electromagnetismo", "teacher": ["Profesor López","Profesor w",  "Profesor x",  "Profesor y",  "Profesor z"], "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Comunicaciones"},
   {"title": "Máquinas Eléctricas", "teacher": "Profesor Silva", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Automatización"},
   {"title": "Mecánica de Suelos", "teacher": "Profesora Martínez", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Geotécnica"},
   {"title": "Diseño Estructural", "teacher": "Profesor Pérez", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Estructuras"},
@@ -113,6 +117,6 @@ courses = [
   {"title": "Evaluación de Impacto Ambiental", "teacher": "Profesor Ibáñez", "area": "Ambiental", "mayor": "Ingeniería Ambiental", "minor": "Legislación Ambiental"}
 ]
 
-@app.get("/courses", response_model=List[Dict[str, str]])
+@app.get("/courses", response_model=List[Dict[str, Union[str, List[str]]]])
 async def get_courses():
     return courses
