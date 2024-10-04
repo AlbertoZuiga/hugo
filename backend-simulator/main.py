@@ -120,3 +120,15 @@ courses = [
 @app.get("/courses", response_model=List[Dict[str, Union[str, List[str]]]])
 async def get_courses():
     return courses
+
+selected_courses = [
+  {"title": "Circuitos Eléctricos", "teacher": "Profesor Gómez", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Electrónica"},
+  {"title": "Máquinas Eléctricas", "teacher": "Profesor Silva", "area": "Eléctrica", "mayor": "Ingeniería Eléctrica", "minor": "Automatización"},
+  {"title": "Mecánica de Suelos", "teacher": "Profesora Martínez", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Geotécnica"},
+  {"title": "Diseño Estructural", "teacher": "Profesor Pérez", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Estructuras"},
+  {"title": "Hidráulica de Canales", "teacher": "Profesora Vargas", "area": "Obras Civiles", "mayor": "Ingeniería Civil", "minor": "Hidráulica"}
+]
+
+@app.get("/selected_courses", response_model=List[Dict[str, Union[str, List[str]]]])
+async def get_selected_courses():
+    return selected_courses

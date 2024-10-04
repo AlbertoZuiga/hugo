@@ -1,13 +1,9 @@
 .schedule-preferences {
   padding: 20px;
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-
-.unavailable-times {
-  margin-bottom: 20px;
 }
 
 h2 {
