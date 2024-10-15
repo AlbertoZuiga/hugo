@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, List, Union
+import shutil
 
 app = FastAPI()
 
@@ -13,7 +14,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# Ruta para manejar la subida de archivos
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    try:
+        # Guardar el archivo en el servidor
+        file_location = f"uploads/{file.filename}"
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(file.file, file_object)
+        return {"info": f"Archivo '{file.filename}' subido exitosamente a '{file_location}'"}
+    except Exception as e:
+        return {"error": str(e)}
+    
+    
 schedules = [
     {
         "lunes": {

@@ -5,7 +5,8 @@ import Footer from './components/footer/Footer';
 import Home from './pages/home/Home';
 import SearchCourses from './pages/search_courses/SearchCourses';
 import SchedulePreferences from './components/schedule_preferences/SchedulePreferences';
-import Login from './pages/login/Login'; // Importa el componente de login
+import Login from './pages/login/Login';
+import UploadExcel from './pages/upload_excel/UploadExcel';
 
 const App = () => {
     return (
@@ -14,10 +15,11 @@ const App = () => {
                 <Navbar />
                 <main style={{ flex: '1' }}>
                     <Routes>
-                        <Route path="/" element={<Home />} /> 
+                        <Route path="/" element={<Home />} />
                         <Route path="/search-courses" element={<SearchCourses />} />
                         <Route path="/schedule-preferences" element={<SchedulePreferences />} />
-                        <Route path="/login" element={<Login />} /> {/* Nueva ruta para login */}
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/upload-excel" element={<UploadExcel />} /> {/* Nueva ruta para subir Excel */}
                     </Routes>
                 </main>
                 <Footer />
