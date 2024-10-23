@@ -1,47 +1,50 @@
 import React, { useState } from 'react';
-import './Login.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginRequest, loginSuccess, loginFailure } from '../../redux/actions/authActions';
+import { loginUserApi } from '../../api/loginUserApi'; 
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector(state => state.auth);
+
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    dispatch(loginRequest({ username, password }));
+    
+    try {
+      // Llamar a la API de login
+      const { token, user } = await loginUserApi(username, password);
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+      // Despachar el loginSuccess con los datos del usuario
+      dispatch(loginSuccess({ token, user }));
+
+    } catch (err) {
+      dispatch(loginFailure(err.message));  // Despachar el error si ocurre
+    }
   };
 
   return (
-    <div className="login-container">
-      <h1>Iniciar Sesión</h1>
-      <form className="login-form">
-        <div className="input-group">
-          <label htmlFor="email">Correo electrónico</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={handleEmailChange}
-            placeholder="Introduce tu correo"
-          />
-        </div>
-        <div className="input-group">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={handlePasswordChange}
-            placeholder="Introduce tu contraseña"
-          />
-        </div>
-        <button type="submit" className="login-button">
-          Iniciar sesión
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleLogin}>
+      <input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username"
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password"
+      />
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? 'Cargando...' : 'Iniciar sesión'}
+      </button>
+      {error && <p>{error}</p>}
+    </form>
   );
 };
 

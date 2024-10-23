@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { getCoursesApi } from '../../api/getCoursesApi';
 import './SearchCourses.css';
 
 const SearchCourses = () => {
@@ -8,71 +8,36 @@ const SearchCourses = () => {
   const [selectedCourses, setSelectedCourses] = useState([]); // Ramos seleccionados
   const [loading, setLoading] = useState(true); // Estado de carga
   const [showSelectedCourses, setShowSelectedCourses] = useState(false); // Toggle para mostrar lista seleccionada
-  const [selectedArea, setSelectedArea] = useState(''); // Estado para el área seleccionada
-  const [selectedMajor, setSelectedMajor] = useState(''); // Estado para el major seleccionado
-  const [selectedMinor, setSelectedMinor] = useState(''); // Estado para el minor seleccionado
   const [professorSearchTerm, setProfessorSearchTerm] = useState(''); // Término de búsqueda para el profesor
+  const token = localStorage.getItem('authToken');
 
   // Obtener la lista de ramos del backend
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/courses');
-        setCourses(response.data);
-        setLoading(false);
+        const data = await getCoursesApi(token); // Llama a la API
+        setCourses(data); // Almacena los cursos obtenidos en el estado
       } catch (error) {
         console.error('Error fetching courses:', error);
-        setLoading(false);
+        // Aquí puedes manejar el error según sea necesario
+      } finally {
+        setLoading(false); // Cambia el estado de carga
       }
     };
 
-    fetchCourses();
-  }, []);
-
-  // Unificar la estructura de profesores: manejar ambos formatos
-  const normalizeCourseTeachers = (courses) => {
-    return courses.map((course) => ({
-      ...course,
-      teachers: Array.isArray(course.teacher) ? course.teacher : [course.teacher], // Convertir "teacher" en un array si no lo es
-    }));
-  };
-
-  // Agrupar profesores por el título del ramo
-  const groupCoursesByTitle = (courses) => {
-    const grouped = {};
-    courses.forEach((course) => {
-      const { title, teachers } = course; // Extraer el título y profesores ya normalizados
-
-      if (!grouped[title]) {
-        grouped[title] = {
-          ...course,
-          teachers: [...teachers], // Crear un array de profesores
-        };
-      } else {
-        // Evitar duplicados de profesores en la misma agrupación
-        const allTeachers = [...grouped[title].teachers, ...teachers];
-        grouped[title].teachers = Array.from(new Set(allTeachers)); // Actualizar lista de profesores sin duplicados
-      }
-    });
-    return Object.values(grouped); // Devolver los ramos agrupados
-  };
+    fetchCourses(); // Llama a la función para obtener los cursos
+  }, [token]); // Asegúrate de que el token no cambie
 
   // Filtrar ramos según los filtros aplicados
-  const filteredCourses = groupCoursesByTitle(normalizeCourseTeachers(courses)).filter((course) =>
-    course.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedArea === '' || course.area === selectedArea) &&
-    (selectedMajor === '' || course.mayor === selectedMajor) &&
-    (selectedMinor === '' || course.minor === selectedMinor) &&
-    (professorSearchTerm === '' || course.teachers.some((teacher) =>
-      teacher.toLowerCase().includes(professorSearchTerm.toLowerCase())
-    ))
+  const filteredCourses = courses.filter((course) =>
+    course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Manejar selección y deselección de ramos
   const handleCourseClick = (course) => {
-    if (selectedCourses.some((selected) => selected.title === course.title)) {
+    if (selectedCourses.some((selected) => selected.url === course.url)) {
       // Deseleccionar el ramo si ya está en la lista de seleccionados
-      setSelectedCourses(selectedCourses.filter((c) => c.title !== course.title));
+      setSelectedCourses(selectedCourses.filter((c) => c.url !== course.url));
     } else {
       // Seleccionar el ramo si no está en la lista
       setSelectedCourses([...selectedCourses, course]);
@@ -84,26 +49,6 @@ const SearchCourses = () => {
     setSearchTerm(event.target.value);
   };
 
-  // Manejar el cambio de área
-  const handleAreaChange = (event) => {
-    setSelectedArea(event.target.value);
-  };
-
-  // Manejar el cambio de mayor
-  const handleMajorChange = (event) => {
-    setSelectedMajor(event.target.value);
-  };
-
-  // Manejar el cambio de minor
-  const handleMinorChange = (event) => {
-    setSelectedMinor(event.target.value);
-  };
-
-  // Manejar la búsqueda por nombre del profesor
-  const handleProfessorSearchChange = (event) => {
-    setProfessorSearchTerm(event.target.value);
-  };
-
   // Toggle para cambiar entre mostrar la lista de todos los ramos o los ramos seleccionados
   const toggleView = () => {
     setShowSelectedCourses(!showSelectedCourses);
@@ -112,12 +57,6 @@ const SearchCourses = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
-  // Obtener una lista única de áreas, majors, minors y profesores para los dropdowns y el filtro de profesores
-  const areas = [...new Set(courses.map(course => course.area))];
-  const majors = [...new Set(courses.map(course => course.mayor))];
-  const minors = [...new Set(courses.map(course => course.minor))];
-  const allProfessors = [...new Set(courses.flatMap(course => course.teachers))];
 
   return (
     <div className="course-selection">
@@ -132,50 +71,6 @@ const SearchCourses = () => {
         className="search-bar"
       />
 
-      {/* Contenedor para filtros */}
-      <div className="filters">
-        {/* Filtro por área */}
-        <select value={selectedArea} onChange={handleAreaChange} className="area-filter">
-          <option value="">Todas las Áreas</option>
-          {areas.map((area, index) => (
-            <option key={index} value={area}>
-              {area}
-            </option>
-          ))}
-        </select>
-
-        {/* Filtro por mayor */}
-        <select value={selectedMajor} onChange={handleMajorChange} className="major-filter">
-          <option value="">Todos los Mayors</option>
-          {majors.map((major, index) => (
-            <option key={index} value={major}>
-              {major}
-            </option>
-          ))}
-        </select>
-
-        {/* Filtro por minor */}
-        <select value={selectedMinor} onChange={handleMinorChange} className="minor-filter">
-          <option value="">Todos los Minors</option>
-          {minors.map((minor, index) => (
-            <option key={index} value={minor}>
-              {minor}
-            </option>
-          ))}
-        </select>
-
-        {/* Filtro por profesor */}
-        <div className="professor-filter">
-          <input
-            type="text"
-            placeholder="Buscar profesor..."
-            value={professorSearchTerm}
-            onChange={handleProfessorSearchChange}
-            className="search-bar"
-          />
-        </div>
-      </div>
-
       {/* Toggle para cambiar entre las listas */}
       <button onClick={toggleView} className="toggle-button">
         {showSelectedCourses ? 'Ver Todos los Ramos' : 'Ver Ramos Seleccionados'}
@@ -188,14 +83,9 @@ const SearchCourses = () => {
           {selectedCourses.length > 0 ? (
             selectedCourses.map((course, index) => (
               <div key={index} className="selected-course-item">
-                <h3>{course.title}</h3>
-                <p>Profesores:</p>
-                {course.teachers.map((prof, idx) => (
-                  <p key={idx}>{prof}</p>
-                ))}
-                <p>Área: {course.area}</p>
-                <p>Mayor: {course.mayor}</p>
-                <p>Minor: {course.minor}</p>
+                <h3>{course.nombre}</h3>
+                <p>Créditos: {course.creditos}</p>
+                <p>URL: {course.url}</p>
               </div>
             ))
           ) : (
@@ -208,14 +98,13 @@ const SearchCourses = () => {
             <div
               key={index}
               className={`course-item ${
-                selectedCourses.some((selected) => selected.title === course.title) ? 'selected' : ''
+                selectedCourses.some((selected) => selected.url === course.url) ? 'selected' : ''
               }`}
               onClick={() => handleCourseClick(course)}
             >
-              <h3>{course.title}</h3>
-              <p>Área: {course.area}</p>
-              <p>Mayor: {course.mayor}</p>
-              <p>Minor: {course.minor}</p>
+              <h3>{course.nombre}</h3>
+              <p>Créditos: {course.creditos}</p>
+              <p>URL: {course.url}</p>
             </div>
           ))}
         </div>
