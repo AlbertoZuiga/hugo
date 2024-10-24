@@ -3,7 +3,7 @@ import UserPreferences from "../user_preferences/UserPreferences";
 import ProtectedSchedule from "../protected_schedule/ProtectedSchedule";
 import { useSelector, useDispatch } from "react-redux";
 import { schedulesApi } from "../../api/schedulesApi";
-import { setSchedules } from "../../redux/actions/schedulesActions"; // Importar la acción
+import { setSchedules } from "../../redux/actions/schedulesActions";
 import "./SchedulePreferences.css";
 
 const SchedulePreferences = () => {
@@ -14,7 +14,7 @@ const SchedulePreferences = () => {
   const [error, setError] = useState(null);
 
   const handleSavePreferences = async () => {
-    const token = "e81c1adc0d949d945774869dcae37e3dc64b488e";
+    const token = localStorage.getItem('authToken');
 
     setLoading(true);
     setError(null);

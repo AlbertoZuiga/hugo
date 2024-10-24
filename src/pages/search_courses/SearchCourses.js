@@ -2,12 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { coursesApi } from "../../api/coursesApi";
 import { addCourse, removeCourse } from "../../redux/actions/courseActions";
+import { schedulesApi } from "../../api/schedulesApi";
+import { setSchedules } from "../../redux/actions/schedulesActions"; // Importar la acción
 import "./SearchCourses.css";
+import ProtectedSchedule from "../../components/protected_schedule/ProtectedSchedule";
 
 const SearchCourses = () => {
   const [courses, setCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showSelectedOnly, setShowSelectedOnly] = useState(false); // Estado para controlar la vista
+  const [avoidTimeConflicts, setAvoidTimeConflicts] = useState(false); // Estado para el checkbox
   const dispatch = useDispatch();
   const selectedCourses = useSelector((state) => state.courses.selectedCourses);
   const token = localStorage.getItem("authToken");
@@ -15,7 +20,7 @@ const SearchCourses = () => {
   // Efecto para obtener los cursos desde la API
   useEffect(() => {
     const fetchCourses = async () => {
-      setLoading(true); // Iniciar la carga
+      setLoading(true);
       try {
         const data = await coursesApi(token);
         setCourses(data);
@@ -36,76 +41,131 @@ const SearchCourses = () => {
       } catch (error) {
         console.error("Error fetching courses:", error);
       } finally {
-        setLoading(false); // Finalizar la carga
+        setLoading(false);
       }
     };
 
-    fetchCourses(); // Llamar a la función para obtener cursos
-  }, [token, dispatch]); // Observamos solo `token` y `dispatch`
+    fetchCourses();
+  }, [token, dispatch]);
 
   // Manejo de la selección de cursos
   const handleCourseClick = (course) => {
-    // Al hacer clic, simplemente agrega o remueve el curso
     if (selectedCourses.some((selected) => selected.url === course.url)) {
-      dispatch(removeCourse(course)); // Remover el curso si ya está seleccionado
+      dispatch(removeCourse(course));
     } else {
-      dispatch(addCourse(course)); // Añadir el curso si no está seleccionado
+      dispatch(addCourse(course));
+    }
+    sendPreferences(); // Enviar preferencias al hacer click en un curso
+  };
+
+  // Manejo del botón para alternar vistas
+  const toggleView = () => {
+    setShowSelectedOnly((prev) => !prev); // Alternar entre mostrar solo seleccionados o todos
+    sendPreferences(); // Enviar preferencias al cambiar la vista
+  };
+
+  // Manejo del cambio del checkbox
+  const handleCheckboxChange = () => {
+    setAvoidTimeConflicts((prev) => !prev); // Alternar el estado del checkbox
+    sendPreferences(); // Enviar preferencias al cambiar el checkbox
+  };
+
+  // Función para enviar preferencias al backend
+  const sendPreferences = async () => {
+    const preferencesData = {
+      permite_solapamiento: avoidTimeConflicts,
+      cursos: selectedCourses.map((course) => course.url.split('/').filter(Boolean).pop()), // Enviar las URLs de los cursos seleccionados
+    };
+
+    try {
+      const response = await schedulesApi(token, preferencesData); // Llama a la API para enviar preferencias
+      console.log("Preferencias enviadas al backend:", response);
+      dispatch(setSchedules(response.data)); // Guardar los horarios en Redux
+    } catch (error) {
+      console.error("Error al enviar preferencias:", error);
     }
   };
 
   return (
     <div className="course-selection">
-      <h1>Buscar y Seleccionar Ramos</h1>
+      {/* Botón para alternar la vista, siempre visible */}
+      <button onClick={toggleView} className="toggle-view-button">
+        {showSelectedOnly
+          ? "Mostrar Todos los Ramos"
+          : "Mostrar Ramos Seleccionados"}
+      </button>
 
-      <input
-        type="text"
-        placeholder="Buscar ramo..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="search-bar"
-      />
+      {showSelectedOnly ? (
+        <>
+          {/* Toggle para evitar topes de horarios */}
+          <div className="toggle-container">
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={avoidTimeConflicts}
+                onChange={handleCheckboxChange}
+              />
+              <span className="slider"></span>
+              <span className="toggle-label">Evitar topes de horarios</span>
+            </label>
+          </div>
 
-      {loading ? (
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Cargando cursos...</p>
-        </div>
+          <div className="selected-courses">
+            <h2>Ramos seleccionados:</h2>
+            {selectedCourses.length > 0 ? (
+              selectedCourses.map((course, index) => (
+                <div key={index} className="selected-course-item">
+                  <h3>{course.nombre}</h3>
+                  <p>Créditos: {course.creditos}</p>
+                </div>
+              ))
+            ) : (
+              <p>No has seleccionado ningún ramo aún.</p>
+            )}
+          </div>
+          <ProtectedSchedule />
+        </>
       ) : (
-        <div className="courses-list">
-          {courses
-            .filter((course) =>
-              course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .map((course) => (
-              <div
-                key={course.url}
-                className={`course-item ${
-                  selectedCourses.some((selected) => selected.url === course.url)
-                    ? "selected"
-                    : ""
-                }`}
-                onClick={() => handleCourseClick(course)} // Manejar clic en curso
-              >
-                <h3>{course.nombre}</h3>
-                <p>Créditos: {course.creditos}</p>
-              </div>
-            ))}
+        <div>
+          <input
+            type="text"
+            placeholder="Buscar ramo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-bar"
+          />
+
+          {loading ? (
+            <div className="loading-container">
+              <div className="spinner"></div>
+              <p>Cargando cursos...</p>
+            </div>
+          ) : (
+            <div className="courses-list">
+              {courses
+                .filter((course) =>
+                  course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((course) => (
+                  <div
+                    key={course.url}
+                    className={`course-item ${
+                      selectedCourses.some(
+                        (selected) => selected.url === course.url
+                      )
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() => handleCourseClick(course)}
+                  >
+                    <h3>{course.nombre}</h3>
+                    <p>Créditos: {course.creditos}</p>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       )}
-
-      <div className="selected-courses">
-        <h2>Ramos seleccionados:</h2>
-        {selectedCourses.length > 0 ? (
-          selectedCourses.map((course, index) => (
-            <div key={index} className="selected-course-item">
-              <h3>{course.nombre}</h3>
-              <p>Créditos: {course.creditos}</p>
-            </div>
-          ))
-        ) : (
-          <p>No has seleccionado ningún ramo aún.</p>
-        )}
-      </div>
     </div>
   );
 };
