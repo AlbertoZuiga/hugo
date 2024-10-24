@@ -12,9 +12,10 @@ const SearchCourses = () => {
   const selectedCourses = useSelector((state) => state.courses.selectedCourses);
   const token = localStorage.getItem("authToken");
 
-  // Sincronización de cursos seleccionados con los obtenidos de la API
+  // Efecto para obtener los cursos desde la API
   useEffect(() => {
     const fetchCourses = async () => {
+      setLoading(true); // Iniciar la carga
       try {
         const data = await coursesApi(token);
         setCourses(data);
@@ -35,24 +36,22 @@ const SearchCourses = () => {
       } catch (error) {
         console.error("Error fetching courses:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Finalizar la carga
       }
     };
 
-    fetchCourses();
-  }, [token, dispatch, selectedCourses]);
+    fetchCourses(); // Llamar a la función para obtener cursos
+  }, [token, dispatch]); // Observamos solo `token` y `dispatch`
 
+  // Manejo de la selección de cursos
   const handleCourseClick = (course) => {
+    // Al hacer clic, simplemente agrega o remueve el curso
     if (selectedCourses.some((selected) => selected.url === course.url)) {
       dispatch(removeCourse(course)); // Remover el curso si ya está seleccionado
     } else {
       dispatch(addCourse(course)); // Añadir el curso si no está seleccionado
     }
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="course-selection">
@@ -66,26 +65,33 @@ const SearchCourses = () => {
         className="search-bar"
       />
 
-      <div className="courses-list">
-        {courses
-          .filter((course) =>
-            course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((course) => (
-            <div
-              key={course.url}
-              className={`course-item ${
-                selectedCourses.some((selected) => selected.url === course.url)
-                  ? "selected"
-                  : ""
-              }`}
-              onClick={() => handleCourseClick(course)}
-            >
-              <h3>{course.nombre}</h3>
-              <p>Créditos: {course.creditos}</p>
-            </div>
-          ))}
-      </div>
+      {loading ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Cargando cursos...</p>
+        </div>
+      ) : (
+        <div className="courses-list">
+          {courses
+            .filter((course) =>
+              course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+            .map((course) => (
+              <div
+                key={course.url}
+                className={`course-item ${
+                  selectedCourses.some((selected) => selected.url === course.url)
+                    ? "selected"
+                    : ""
+                }`}
+                onClick={() => handleCourseClick(course)} // Manejar clic en curso
+              >
+                <h3>{course.nombre}</h3>
+                <p>Créditos: {course.creditos}</p>
+              </div>
+            ))}
+        </div>
+      )}
 
       <div className="selected-courses">
         <h2>Ramos seleccionados:</h2>
