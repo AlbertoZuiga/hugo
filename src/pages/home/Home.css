@@ -1,0 +1,63 @@
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .schedule-table th,
+  .schedule-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .schedule-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .schedule-table td {
+    height: 60px;
+  }
+  
+  .schedule-table th:first-child,
+  .schedule-table td:first-child {
+    width: 120px;
+  }
+  
+  /* Colores predefinidos para los cursos */
+  .course-1 {
+    background-color: #ffcc80;
+    color: #000;
+  }
+  
+  .course-2 {
+    background-color: #90caf9;
+    color: #000;
+  }
+  
+  /* Más clases de curso... */
+  
+  .course {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  
+  .course-name {
+    font-weight: bold;
+  }
+  
+  .course-sala,
+  .course-tipo {
+    margin-top: 5px;
+  }
+  
+  .conflict {
+    border: 2px solid red;
+    height: 50%;
+  }
+  
