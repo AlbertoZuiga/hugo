@@ -26,12 +26,9 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/search-courses" element={<SearchCourses />} />
-              <Route
-                path="/schedule-preferences"
-                element={<SchedulePreferences />}
-              />
+              <Route path="/schedule-preferences" element={<SchedulePreferences />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/upload-excel" element={<UploadExcel />} />{" "}{/* Nueva ruta para subir Excel */}
+              <Route path="/upload-excel" element={<UploadExcel />} />
             </Routes>
           </main>
           <Footer />
