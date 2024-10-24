@@ -1,10 +1,7 @@
 import axios from 'axios';
 
-// Función para subir un archivo Excel
-export const uploadExcelApi = async (file, token) => {
-  const formData = new FormData();
-  formData.append('file', file);
-
+// Función para subir un archivo Excel y las cabeceras
+export const uploadExcelApi = async (formData, token) => {
   try {
     const response = await axios.post(`http://localhost:8000/upload-excel/`, formData, {
       headers: {

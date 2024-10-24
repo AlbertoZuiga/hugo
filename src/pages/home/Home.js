@@ -31,13 +31,8 @@ const Home = () => {
     setSelectedSchedule(event.target.value);
   };
 
-  // Si no hay horarios, mostrar un mensaje
-  if (!horarios || horarios.length === 0) {
-    return <div>No hay horarios disponibles</div>;
-  }
-
-  // Obtener el horario seleccionado
-  const schedule = horarios[selectedSchedule];
+  // Obtener el horario seleccionado si existe
+  const schedule = horarios && horarios.length > 0 ? horarios[selectedSchedule] : [];
 
   // Filtrar bloques de tipo CLAS, AYUD, LABT para el horario semanal
   const weeklySchedule = schedule.filter((bloque) =>
@@ -114,7 +109,7 @@ const Home = () => {
           className={`${courseClass} ${isOverlapping ? "conflict" : ""}`}
         >
           <div className="course-name">{bloque.nombre_curso}</div>
-          <div className="course-nrc">NRC: {bloque.nrc}</div> {/* Imprimir el NRC */}
+          <div className="course-nrc">NRC: {bloque.nrc}</div>
           <div className="course-sala">Sala: {bloque.sala}</div>
           <div className="course-tipo">{bloque.tipo}</div>
         </div>
@@ -128,7 +123,7 @@ const Home = () => {
         <h2>Eventos Especiales</h2>
         {specialEvents.map((evento, index) => (
           <div key={index} className="event-item">
-            <h3>{evento.nombre_curso} (Sección: {evento.seccion})</h3>
+            <h3>{evento.nombre_curso} (NRC: {evento.nrc})</h3>
             <p>
               <strong>Tipo:</strong> {evento.tipo}
             </p>
@@ -215,11 +210,15 @@ const Home = () => {
         onChange={handleScheduleChange}
         value={selectedSchedule}
       >
-        {horarios.map((_, index) => (
-          <option key={index} value={index}>
-            Horario {index + 1}
-          </option>
-        ))}
+        {horarios.length > 0 ? (
+          horarios.map((_, index) => (
+            <option key={index} value={index}>
+              Horario {index + 1}
+            </option>
+          ))
+        ) : (
+          <option value="0">Horario vacío</option>
+        )}
       </select>
 
       {/* Mostrar el horario semanal en formato tabla */}

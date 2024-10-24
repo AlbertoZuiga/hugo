@@ -29,6 +29,10 @@ const authReducer = (state = initialState, action) => {
         isLoading: false,
         error: action.payload,
       };
+    case 'LOGOUT':
+      return {
+        ...initialState, // Restablece el estado inicial al cerrar sesión
+      };
     default:
       return state;
   }
