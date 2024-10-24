@@ -1,47 +1,23 @@
 .login-container {
   max-width: 400px;
-  margin: 0 auto;
+  margin: 50px auto; /* Espaciado superior */
   padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
+  border-radius: 12px; /* Bordes más redondeados */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff; /* Fondo blanco */
 }
 
 .login-title {
   text-align: center;
   margin-bottom: 20px;
-  font-size: 1.5em;
+  font-size: 1.8em; /* Aumentar tamaño de fuente */
+  color: #333; /* Color del título */
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-}
-
-.login-button {
-  border: none;
-  border-radius: 5px;
-  padding: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  background-color: #28a745;
-  color: white;
-}
-
-.login-button:hover {
-  background-color: #218838
-}
-
-.login-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.error-message {
-  color: red;
-  text-align: center;
-  margin-top: 10px;
 }
 
 .floating-label {
@@ -54,7 +30,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 12px 10px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
@@ -62,7 +38,7 @@
 }
 
 .floating-label input:focus {
-  border-color: #28a745; 
+  border-color: #28a745; /* Color del borde en foco */
 }
 
 .floating-label label {
@@ -78,39 +54,53 @@
   transition: all 0.3s ease;
 }
 
-
 .floating-label input:focus + label,
 .floating-label input:valid + label {
   top: 0;
   left: 10px;
   font-size: 0.85rem;
-  color: #28a745; 
+  color: #28a745; /* Color del label cuando está enfocado o validado */
 }
 
-
-.floating-label input:valid + label::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid #ddd; 
-  border-radius: 8px; 
-  z-index: -1; 
-  transition: all 0.3s ease; 
+.login-button {
+  border: none;
+  border-radius: 8px; /* Bordes redondeados */
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+  background-color: #28a745; /* Color del botón */
+  color: white;
+  font-size: 1rem; /* Aumentar tamaño de fuente */
 }
 
+.login-button:hover {
+  background-color: #218838; /* Color al pasar el mouse */
+  transform: scale(1.05); /* Efecto de aumento */
+}
 
-.floating-label input:focus + label::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid #28a745; 
-  border-radius: 8px; 
-  z-index: -1; 
-  transition: all 0.3s ease; 
+.login-button:disabled {
+  background-color: #ccc; /* Color para el botón deshabilitado */
+  cursor: not-allowed; /* Cursor no permitido */
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.spinner {
+  margin-top: 15px;
+  width: 24px;
+  height: 24px;
+  border: 4px solid rgba(40, 167, 69, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #28a745; /* Color del spinner */
+  animation: spin 1s linear infinite; /* Animación de giro */
+}
+
+/* Animación de giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

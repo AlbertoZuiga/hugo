@@ -17,7 +17,7 @@ const Login = () => {
     try {
       const { token, user } = await loginUserApi(username, password);
       dispatch(loginSuccess({ token, user }));
-      console.log('Inicio de sesion exitoso')
+      console.log('Inicio de sesión exitoso');
     } catch (err) {
       dispatch(loginFailure(err.message));
     }
@@ -49,10 +49,11 @@ const Login = () => {
           />
           <label htmlFor="password">Contraseña</label>
         </div>
-        <button type="submit" disabled={isLoading} className="login-button">
+        <button type="submit" disabled={isLoading} className={`login-button ${isLoading ? 'loading' : ''}`}>
           {isLoading ? 'Cargando...' : 'Iniciar sesión'}
         </button>
         {error && <p className="error-message">{error}</p>}
+        {isLoading && <div className="spinner"></div>} {/* Spinner de carga */}
       </form>
     </div>
   );
