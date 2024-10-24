@@ -1,7 +1,6 @@
-// src/api/getCoursesApi.js
 import axios from "axios";
 
-export const getCoursesApi = async (token) => {
+export const coursesApi = async (token) => {
   try {
     const response = await axios.get(`http://localhost:8000/cursos/`, {
       headers: {

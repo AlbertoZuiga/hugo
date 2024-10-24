@@ -1,3 +1,4 @@
+// ProtectedSchedule.js
 import React, { useState } from "react";
 import "./ProtectedSchedule.css"; // Asegúrate de crear este archivo para los estilos
 
@@ -138,9 +139,6 @@ const ProtectedSchedule = () => {
           ))}
         </tbody>
       </table>
-      <button onClick={() => console.log(protectedTimes)}>
-        Guardar Horarios Protegidos
-      </button>
     </div>
   );
 };
