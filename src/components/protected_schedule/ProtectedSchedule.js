@@ -31,30 +31,38 @@ const ProtectedSchedule = () => {
     )
   );
 
-  // Estado para gestionar el click and drag
+  // Estado para gestionar el drag y el click
   const [isDragging, setIsDragging] = useState(false);
   const [dragAction, setDragAction] = useState(null); // null, 'select', or 'deselect'
   const [dragStart, setDragStart] = useState({ row: null, col: null }); // Indica la celda inicial
-  const [initialProtectedTimes, setInitialProtectedTimes] = useState([]); // Estado inicial al comenzar el drag
 
   const handleMouseDown = (slotIndex, dayIndex) => {
     const isSelected = protectedTimes[slotIndex][daysOfWeek[dayIndex]];
     setIsDragging(true);
     setDragAction(isSelected ? "deselect" : "select");
     setDragStart({ row: slotIndex, col: dayIndex });
-    setInitialProtectedTimes(protectedTimes); // Guarda el estado inicial
+    toggleCell(slotIndex, dayIndex, isSelected);
   };
 
   const handleMouseEnter = (slotIndex, dayIndex) => {
     if (isDragging) {
-      const startRow = dragStart.row;
-      const startCol = dragStart.col;
-      handleToggleArea(startRow, startCol, slotIndex, dayIndex); // Actualiza el área de arrastre
+      handleToggleArea(dragStart.row, dragStart.col, slotIndex, dayIndex); // Actualiza el área de arrastre
     }
   };
 
   const handleMouseUp = () => {
     setIsDragging(false); // Finaliza el arrastre
+  };
+
+  const toggleCell = (slotIndex, dayIndex, isSelected) => {
+    setProtectedTimes((prev) => {
+      const newProtectedTimes = [...prev];
+      newProtectedTimes[slotIndex] = {
+        ...newProtectedTimes[slotIndex],
+        [daysOfWeek[dayIndex]]: !isSelected, // Cambia el estado de la celda
+      };
+      return newProtectedTimes;
+    });
   };
 
   // Actualiza todas las celdas dentro del área
@@ -68,26 +76,12 @@ const ProtectedSchedule = () => {
       const newProtectedTimes = [...prev]; // Copia el estado anterior
 
       // Itera sobre el área afectada
-      for (let row = 0; row < timeSlots.length; row++) {
-        for (let col = 0; col < daysOfWeek.length; col++) {
-          const isInArea =
-            row >= minRow && row <= maxRow && col >= minCol && col <= maxCol;
-          const wasInitiallySelected =
-            initialProtectedTimes[row][daysOfWeek[col]];
-
-          // Si está en el área de selección actual, aplicar la acción (seleccionar/deseleccionar)
-          if (isInArea) {
-            newProtectedTimes[row] = {
-              ...newProtectedTimes[row],
-              [daysOfWeek[col]]: dragAction === "select" ? true : false,
-            };
-          } else {
-            // Fuera del área: restaurar el valor original del inicio del drag
-            newProtectedTimes[row] = {
-              ...newProtectedTimes[row],
-              [daysOfWeek[col]]: wasInitiallySelected,
-            };
-          }
+      for (let row = minRow; row <= maxRow; row++) {
+        for (let col = minCol; col <= maxCol; col++) {
+          newProtectedTimes[row] = {
+            ...newProtectedTimes[row],
+            [daysOfWeek[col]]: dragAction === "select",
+          };
         }
       }
 
