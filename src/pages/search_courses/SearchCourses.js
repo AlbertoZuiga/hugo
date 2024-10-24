@@ -1,57 +1,54 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { getCoursesApi } from '../../api/getCoursesApi';
+import { addCourse, removeCourse } from '../../redux/actions/courseActions';
 import './SearchCourses.css';
 
 const SearchCourses = () => {
-  const [courses, setCourses] = useState([]); // Lista de ramos obtenidos de la API
-  const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
-  const [selectedCourses, setSelectedCourses] = useState([]); // Ramos seleccionados
-  const [loading, setLoading] = useState(true); // Estado de carga
-  const [showSelectedCourses, setShowSelectedCourses] = useState(false); // Toggle para mostrar lista seleccionada
-  const [professorSearchTerm, setProfessorSearchTerm] = useState(''); // Término de búsqueda para el profesor
+  const [courses, setCourses] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const selectedCourses = useSelector((state) => state.courses.selectedCourses);
   const token = localStorage.getItem('authToken');
 
-  // Obtener la lista de ramos del backend
+  // Sincronización de cursos seleccionados con los obtenidos de la API
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data = await getCoursesApi(token); // Llama a la API
-        setCourses(data); // Almacena los cursos obtenidos en el estado
+        const data = await getCoursesApi(token);
+        setCourses(data);
+
+        // Validar los cursos seleccionados frente a los datos actuales de la API
+        const validSelectedCourses = selectedCourses.filter(selectedCourse =>
+          data.some(apiCourse => apiCourse.url === selectedCourse.url)
+        );
+
+        // Actualizar el estado de los cursos seleccionados si hay discrepancias
+        if (validSelectedCourses.length !== selectedCourses.length) {
+          validSelectedCourses.forEach(course => dispatch(addCourse(course)));
+          const invalidCourses = selectedCourses.filter(
+            selectedCourse => !validSelectedCourses.includes(selectedCourse)
+          );
+          invalidCourses.forEach(course => dispatch(removeCourse(course)));
+        }
+
       } catch (error) {
         console.error('Error fetching courses:', error);
-        // Aquí puedes manejar el error según sea necesario
       } finally {
-        setLoading(false); // Cambia el estado de carga
+        setLoading(false);
       }
     };
 
-    fetchCourses(); // Llama a la función para obtener los cursos
-  }, [token]); // Asegúrate de que el token no cambie
+    fetchCourses();
+  }, [token, dispatch, selectedCourses]);
 
-  // Filtrar ramos según los filtros aplicados
-  const filteredCourses = courses.filter((course) =>
-    course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Manejar selección y deselección de ramos
   const handleCourseClick = (course) => {
     if (selectedCourses.some((selected) => selected.url === course.url)) {
-      // Deseleccionar el ramo si ya está en la lista de seleccionados
-      setSelectedCourses(selectedCourses.filter((c) => c.url !== course.url));
+      dispatch(removeCourse(course)); // Remover el curso si ya está seleccionado
     } else {
-      // Seleccionar el ramo si no está en la lista
-      setSelectedCourses([...selectedCourses, course]);
+      dispatch(addCourse(course)); // Añadir el curso si no está seleccionado
     }
-  };
-
-  // Manejar la búsqueda por título del curso
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  // Toggle para cambiar entre mostrar la lista de todos los ramos o los ramos seleccionados
-  const toggleView = () => {
-    setShowSelectedCourses(!showSelectedCourses);
   };
 
   if (loading) {
@@ -62,53 +59,48 @@ const SearchCourses = () => {
     <div className="course-selection">
       <h1>Buscar y Seleccionar Ramos</h1>
 
-      {/* Barra de búsqueda general por título */}
       <input
         type="text"
         placeholder="Buscar ramo..."
         value={searchTerm}
-        onChange={handleSearchChange}
+        onChange={(e) => setSearchTerm(e.target.value)}
         className="search-bar"
       />
 
-      {/* Toggle para cambiar entre las listas */}
-      <button onClick={toggleView} className="toggle-button">
-        {showSelectedCourses ? 'Ver Todos los Ramos' : 'Ver Ramos Seleccionados'}
-      </button>
-
-      {/* Mostrar ramos filtrados o ramos seleccionados, según el estado del toggle */}
-      {showSelectedCourses ? (
-        <div className="selected-courses">
-          <h2>Ramos seleccionados:</h2>
-          {selectedCourses.length > 0 ? (
-            selectedCourses.map((course, index) => (
-              <div key={index} className="selected-course-item">
-                <h3>{course.nombre}</h3>
-                <p>Créditos: {course.creditos}</p>
-                <p>URL: {course.url}</p>
-              </div>
-            ))
-          ) : (
-            <p>No has seleccionado ningún ramo aún.</p>
-          )}
-        </div>
-      ) : (
-        <div className="courses-list">
-          {filteredCourses.map((course, index) => (
+      <div className="courses-list">
+        {courses
+          .filter((course) =>
+            course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+          .map((course) => (
             <div
-              key={index}
+              key={course.url}
               className={`course-item ${
-                selectedCourses.some((selected) => selected.url === course.url) ? 'selected' : ''
+                selectedCourses.some((selected) => selected.url === course.url)
+                  ? 'selected'
+                  : ''
               }`}
               onClick={() => handleCourseClick(course)}
             >
               <h3>{course.nombre}</h3>
               <p>Créditos: {course.creditos}</p>
-              <p>URL: {course.url}</p>
             </div>
           ))}
-        </div>
-      )}
+      </div>
+
+      <div className="selected-courses">
+        <h2>Ramos seleccionados:</h2>
+        {selectedCourses.length > 0 ? (
+          selectedCourses.map((course, index) => (
+            <div key={index} className="selected-course-item">
+              <h3>{course.nombre}</h3>
+              <p>Créditos: {course.creditos}</p>
+            </div>
+          ))
+        ) : (
+          <p>No has seleccionado ningún ramo aún.</p>
+        )}
+      </div>
     </div>
   );
 };

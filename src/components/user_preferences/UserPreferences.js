@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useSelector } from "react-redux"; // Importar el hook useSelector de Redux
 import "./UserPreferences.css"; // Asegúrate de tener este archivo CSS
 
 const ItemType = "COURSE";
@@ -40,7 +41,7 @@ const CourseItem = ({ course, index, moveCourse, toggleRequired }) => {
       }}
       className={isDragging ? "dragging" : "course-item"}
     >
-      <div>{course.name}</div>
+      <div>{course.nombre}</div> {/* Ajustar para el nombre del curso */}
       <div>
         <input
           type="checkbox"
@@ -54,38 +55,24 @@ const CourseItem = ({ course, index, moveCourse, toggleRequired }) => {
 
 // Componente para las preferencias de usuario
 const UserPreferences = () => {
-  const [coursePreferences, setCoursePreferences] = useState([]);
+  const selectedCourses = useSelector((state) => state.courses.selectedCourses); // Obtener cursos seleccionados de Redux
+  const [coursePreferences, setCoursePreferences] = useState([]); // Estado local para los cursos ordenados
   const [avoidGaps, setAvoidGaps] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Obtener cursos de la API
+  // Sincronizar los cursos seleccionados con el estado local
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/selected_courses");
-
-        if (!response.ok) {
-          throw new Error(`Error en la solicitud: ${response.status}`);
-        }
-
-        const data = await response.json();
-        // Mapea los datos a un formato adecuado
-        setCoursePreferences(
-          data.map((course) => ({
-            name: course.title,
-            required: false,
-          }))
-        );
-      } catch (error) {
-        setErrorMessage(
-          "Hubo un error al cargar los cursos. Intenta nuevamente."
-        );
-        console.error("Error al obtener los cursos:", error);
-      }
-    };
-
-    fetchCourses();
-  }, []);
+    if (selectedCourses.length > 0) {
+      setCoursePreferences(
+        selectedCourses.map((course) => ({
+          ...course,
+          required: false, // Añadir un campo `required` para cada curso
+        }))
+      );
+    } else {
+      setErrorMessage("No has seleccionado ningún curso.");
+    }
+  }, [selectedCourses]);
 
   // Función para mover un curso en la lista
   const moveCourse = (fromIndex, toIndex) => {
@@ -111,7 +98,7 @@ const UserPreferences = () => {
         {errorMessage && <p className="error-message">{errorMessage}</p>}
         {coursePreferences.map((course, index) => (
           <CourseItem
-            key={course.name}
+            key={course.url} // Usar URL como clave única
             index={index}
             course={course}
             moveCourse={moveCourse}
