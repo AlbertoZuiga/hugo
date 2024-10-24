@@ -114,6 +114,7 @@ const Home = () => {
           className={`${courseClass} ${isOverlapping ? "conflict" : ""}`}
         >
           <div className="course-name">{bloque.nombre_curso}</div>
+          <div className="course-nrc">NRC: {bloque.nrc}</div> {/* Imprimir el NRC */}
           <div className="course-sala">Sala: {bloque.sala}</div>
           <div className="course-tipo">{bloque.tipo}</div>
         </div>
@@ -127,7 +128,7 @@ const Home = () => {
         <h2>Eventos Especiales</h2>
         {specialEvents.map((evento, index) => (
           <div key={index} className="event-item">
-            <h3>{evento.nombre_curso}</h3>
+            <h3>{evento.nombre_curso} (Sección: {evento.seccion})</h3>
             <p>
               <strong>Tipo:</strong> {evento.tipo}
             </p>
@@ -221,7 +222,7 @@ const Home = () => {
         ))}
       </select>
 
-      {/* Mostrar el horario en formato tabla */}
+      {/* Mostrar el horario semanal en formato tabla */}
       {renderSchedule()}
 
       {/* Mostrar eventos especiales en una lista */}
