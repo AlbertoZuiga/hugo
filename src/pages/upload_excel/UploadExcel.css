@@ -1,112 +1,89 @@
-/* Contenedor principal */
-.upload-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 50px;
-    padding: 40px;
-    border-radius: 12px;
-    background-color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  .upload-container h2 {
-    font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  /* Botón para subir Excel */
-  .upload-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 12px 24px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Espacio entre el icono y el texto */
-    transition: background-color 0.3s ease;
-  }
-  
-  .upload-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .upload-button .icon {
-    font-size: 1.5rem;
-  }
-  
-  /* Estilo para el archivo seleccionado */
-  .upload-container p {
-    font-size: 1rem;
-    color: #666;
-    margin-top: 15px;
-    font-style: italic;
-  }
-  
-  /* Botones adicionales (Cursos, Secciones, etc.) */
-  .extra-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    gap: 15px;
-  }
-  
-  .extra-button {
-    background-color: #f7f7f7;
-    border: 1px solid #ddd;
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: #333;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .extra-button:hover {
-    background-color: #e8e8e8;
-  }
-  
-  .extra-button:focus {
-    outline: none;
-    box-shadow: 0 0 5px #007bff;
-  }
-  
-  /* Estilo de la barra superior */
-  .navbar {
-    background-color: #333;
-    color: white;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .navbar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .navbar .nav-links {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .navbar .nav-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-  }
-  
-  .navbar .nav-links a:hover {
-    text-decoration: underline;
-  }
-  
-  
+.upload-excel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  padding: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  max-width: 400px; /* Limita el ancho del contenedor */
+}
+
+.upload-excel-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  font-family: 'Arial', sans-serif; /* Cambia a una fuente moderna */
+}
+
+.upload-excel-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* Asegura que el formulario llene el espacio */
+}
+
+.upload-excel-input {
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 2px solid #007BFF;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.upload-excel-input:focus {
+  border-color: #0056b3; /* Cambia el borde al enfocar */
+  outline: none; /* Quita el contorno por defecto */
+}
+
+.upload-excel-button {
+  padding: 12px 20px;
+  color: #ffffff;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.upload-excel-button:hover {
+  background-color: #0056b3; /* Color al pasar el mouse */
+  transform: scale(1.05); /* Efecto de aumento al pasar el mouse */
+}
+
+.upload-excel-button.loading {
+  background-color: #6c757d; /* Color gris para el botón de carga */
+  cursor: not-allowed; /* Cambia el cursor cuando está deshabilitado */
+}
+
+.upload-excel-error {
+  color: red;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.upload-excel-success {
+  color: green;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* Estilo del spinner */
+.spinner {
+  margin-top: 15px;
+  width: 24px;
+  height: 24px;
+  border: 4px solid rgba(0, 123, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid #007BFF;
+  animation: spin 1s linear infinite; /* Animación de giro */
+}
+
+/* Animación de giro */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
