@@ -8,7 +8,6 @@ const Navbar = () => {
             <Link to="/" className="navbar-logo">HUGO</Link>
             <ul className="navbar-links">
                 <li><Link to="/search-courses">Buscar Ramos</Link></li>
-                <li><Link to="/schedule-preferences">Seleccionar Preferencias</Link></li>
             </ul>
         </nav>
     );
