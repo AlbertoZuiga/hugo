@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/AlbertoZuiga/hugo-frontend.git/static/css/main.8bd6c3fd.css",
+    "main.js": "/AlbertoZuiga/hugo-frontend.git/static/js/main.0ae7efce.js",
+    "static/js/453.ea535d1f.chunk.js": "/AlbertoZuiga/hugo-frontend.git/static/js/453.ea535d1f.chunk.js",
+    "index.html": "/AlbertoZuiga/hugo-frontend.git/index.html",
+    "main.8bd6c3fd.css.map": "/AlbertoZuiga/hugo-frontend.git/static/css/main.8bd6c3fd.css.map",
+    "main.0ae7efce.js.map": "/AlbertoZuiga/hugo-frontend.git/static/js/main.0ae7efce.js.map",
+    "453.ea535d1f.chunk.js.map": "/AlbertoZuiga/hugo-frontend.git/static/js/453.ea535d1f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8bd6c3fd.css",
+    "static/js/main.0ae7efce.js"
+  ]
+}
