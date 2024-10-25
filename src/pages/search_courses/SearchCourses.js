@@ -15,25 +15,65 @@ const SearchCourses = () => {
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
   const [avoidTimeConflicts, setAvoidTimeConflicts] = useState(false);
   const [protectedSchedules, setProtectedSchedules] = useState([]); // Nuevo estado para horarios protegidos
-
+  const [error, setError] = useState(null); // Nuevo estado para errores
+  const [errorPreferences, setErrorPreferences] = useState(null); // Error para las preferencias
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const selectedCourses = useSelector((state) => state.courses.selectedCourses);
   const token = localStorage.getItem("authToken");
 
+  // Agregar temporizador para eliminar el error
+  const showErrorTemporarily = (setErrorFunction, message) => {
+    setErrorFunction(message);
+    setTimeout(() => {
+      setErrorFunction(null); // Limpiar el error después de 5 segundos
+    }, 5000);
+  };
+
   // Fetch courses from the API
   const fetchCourses = useCallback(async () => {
     setLoading(true);
+    setError(null); // Limpiamos el error antes de hacer la solicitud
     try {
       const data = await coursesApi(token);
       setCourses(data);
       validateSelectedCourses(data);
     } catch (error) {
       console.error("Error fetching courses:", error);
+      showErrorTemporarily(
+        setError,
+        "Ocurrió un error al cargar los cursos. Por favor, inténtalo de nuevo."
+      );
     } finally {
       setLoading(false);
     }
   }, [token]);
+
+  const sendPreferences = async () => {
+    setErrorPreferences(null); // Limpiar el error antes de la solicitud
+    const preferencesData = {
+      permite_solapamiento: avoidTimeConflicts,
+      cursos: selectedCourses.map((course) =>
+        course.id
+      ),
+      horarios_protegidos: protectedSchedules,
+    };
+    console.log(preferencesData)
+    console.log(protectedSchedules)
+
+    try {
+      const response = await schedulesApi(token, preferencesData);
+      console.log("Preferencias enviadas al backend:", response);
+      dispatch(setSchedules(response.data));
+      navigate("/");
+    } catch (error) {
+      console.error("Error al enviar preferencias:", error);
+      showErrorTemporarily(
+        setErrorPreferences,
+        "Ocurrió un error al enviar las preferencias. Inténtalo más tarde."
+      );
+    }
+  };
 
   // Validate and update selected courses
   const validateSelectedCourses = (data) => {
@@ -78,34 +118,26 @@ const SearchCourses = () => {
     setProtectedSchedules(formattedProtectedSchedules);
   };
 
-  // Send user preferences to the backend
-  const sendPreferences = async () => {
-    const preferencesData = {
-      permite_solapamiento: avoidTimeConflicts,
-      cursos: selectedCourses.map((course) =>
-        course.url.split("/").filter(Boolean).pop()
-      ),
-      horarios_protegidos: protectedSchedules, // Usa los horarios protegidos formateados
-    };
-
-    try {
-      const response = await schedulesApi(token, preferencesData);
-      console.log("Preferencias enviadas al backend:", response);
-      dispatch(setSchedules(response.data));
-      navigate("/");
-    } catch (error) {
-      console.error("Error al enviar preferencias:", error);
-    }
-  };
-
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
 
   return (
     <div className="course-selection">
+      {error && (
+        <p className={`error-message ${error ? "" : "hidden"}`}>{error}</p>
+      )}
+
+      {errorPreferences && (
+        <p className={`error-message ${errorPreferences ? "" : "hidden"}`}>
+          {errorPreferences}
+        </p>
+      )}
+
       <button onClick={toggleView} className="toggle-view-button">
-        {showSelectedOnly ? "Mostrar Todos los Ramos" : "Mostrar Ramos Seleccionados"}
+        {showSelectedOnly
+          ? "Mostrar Todos los Ramos"
+          : "Mostrar Ramos Seleccionados"}
       </button>
 
       {showSelectedOnly ? (
@@ -145,9 +177,7 @@ const SearchCourses = () => {
             )}
           </div>
 
-          <ProtectedSchedule
-            onScheduleChange={handleProtectedScheduleChange}
-          />
+          <ProtectedSchedule onScheduleChange={handleProtectedScheduleChange} />
         </>
       ) : (
         <div>

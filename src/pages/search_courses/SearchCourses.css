@@ -170,6 +170,30 @@ input:checked + .slider:before {
   background-color: #c82333; /* Rojo más oscuro al pasar el mouse */
 }
 
+.error-message {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 0, 0, 0.85); /* Fondo rojo semitransparente */
+  color: white !important; /* Texto blanco para mayor contraste */
+  padding: 15px 30px; /* Más espacio interno para que el texto no esté muy cerca del borde */
+  border-radius: 8px; /* Bordes redondeados */
+  font-weight: bold;
+  font-size: 16px; /* Tamaño de fuente ajustado */
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+  max-width: 90%; /* Para que el cuadro no se expanda demasiado en pantallas pequeñas */
+  text-align: center; /* Centrar el texto */
+}
+
+.error-message.hidden {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
