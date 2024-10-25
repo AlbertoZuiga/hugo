@@ -2,28 +2,34 @@
   position: sticky;
   top: 0;
   width: 100%;
-  background-color: #333;
+  background-color: #333; /* Color de fondo oscuro */
   padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
   box-sizing: border-box;
   overflow: hidden;
+  transition: background-color 0.3s ease; /* Transición suave para el color de fondo */
 }
 
 .navbar-logo {
-  color: white;
-  font-size: 1.5em;
+  color: white; /* Texto blanco por defecto para el logo */
+  font-size: 1.8em; /* Aumenta el tamaño del texto del logo */
   font-weight: bold;
   text-decoration: none;
+  transition: color 0.3s ease; /* Transición suave para el color */
+}
+
+.navbar-logo:hover {
+  color: #28a745; /* Verde al pasar el mouse */
 }
 
 .navbar-links {
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 30px; /* Aumenta el espacio entre enlaces */
   margin: 0;
   padding: 0;
   white-space: nowrap;
@@ -35,26 +41,29 @@
 
 .navbar-links a,
 .logout-button {
-  color: white;
+  color: white; /* Texto blanco por defecto para los enlaces */
   text-decoration: none;
   font-size: 1.1em;
-  padding: 8px 12px;
-  border: none; /* Sin borde por defecto */
-  background-color: transparent; /* Fondo transparente */
-  transition: color 0.3s ease, border 0.3s ease;
+  padding: 10px 15px; /* Ajusta el padding para más área de clic */
+  border-radius: 5px; /* Borde redondeado por defecto */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Transiciones suaves */
   cursor: pointer;
 }
 
 .navbar-links a:hover,
 .logout-button:hover {
-  color: #ff9800; /* Color naranja al pasar el mouse */
-  border: 1px solid white; /* Borde blanco al pasar el mouse */
-  border-radius: 5px; /* Borde redondeado */
+  background-color: transparent; /* Sin fondo al pasar el mouse */
+  color: #28a745; /* Verde al pasar el mouse */
 }
 
 .logout-button {
   background-color: transparent; /* Fondo transparente */
-  cursor: pointer;
+  border: 2px solid white; /* Borde blanco */
+  transition: background-color 0.3s ease; /* Transición suave para el fondo */
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo ligero al pasar el mouse */
 }
 
 @media (max-width: 768px) {
