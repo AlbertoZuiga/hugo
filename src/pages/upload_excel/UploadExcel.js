@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { uploadExcelApi } from '../../api/uploadExcelApi'; // Importa el servicio
 import './UploadExcel.css'; // Asegúrate de tener este archivo CSS
 
 const UploadExcel = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const navigate = useNavigate();
+
+  // Ensure redirection happens only once after mounting, not on every render
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
   const [file, setFile] = useState(null);
   const [headers, setHeaders] = useState({
     AREA: 'AREA',
@@ -31,10 +43,18 @@ const UploadExcel = () => {
 
   // Función para manejar el cambio de archivo
   const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+    const selectedFile = event.target.files[0];
+    const validFileTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+
+    if (selectedFile && !validFileTypes.includes(selectedFile.type)) {
+      setError('Tipo de archivo no válido. Solo se aceptan archivos Excel.');
+      return;
+    }
+
+    setFile(selectedFile);
     setError(null);
     setSuccessMessage('');
-    setShowHeadersForm(true); // Ahora mostramos el formulario de cabeceras cuando se selecciona un archivo
+    setShowHeadersForm(true); // Mostrar el formulario de cabeceras cuando se selecciona un archivo
   };
 
   // Función para manejar el envío del archivo y las cabeceras editadas
@@ -57,7 +77,11 @@ const UploadExcel = () => {
       setSuccessMessage('Archivo subido exitosamente.');
       console.log(result);
     } catch (error) {
-      setError(`Error: ${error.detail || error}`);
+      if (error.response && error.response.status === 400) {
+        setError('Error: Formato de archivo no válido o encabezados incorrectos.');
+      } else {
+        setError(`Error: ${error.message}`);
+      }
       console.error('Error al subir el archivo:', error);
     } finally {
       setLoading(false);
@@ -72,10 +96,26 @@ const UploadExcel = () => {
     });
   };
 
+  // Limpiar mensajes de éxito después de 3 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  // Limpiar mensajes de error después de 3 segundos
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   return (
     <div className="upload-excel-container">
       <h2 className="upload-excel-title">Subir archivo Excel</h2>
-      
+
       {!file && (
         <form className="upload-excel-form">
           <input 
@@ -100,6 +140,7 @@ const UploadExcel = () => {
                   className="header-input"
                   placeholder=" " // Placeholder necesario para el efecto
                   required // Asegúrate de que el input se considere "válido"
+                  aria-label={`Nombre de la columna para ${key}`} // Accesibilidad
                 />
                 <label className="header-label">{key}</label>
               </div>
@@ -108,7 +149,7 @@ const UploadExcel = () => {
           <button 
             className={`upload-excel-button ${loading ? 'loading' : ''}`} 
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || !file} // Deshabilitar si no hay archivo
           >
             {loading ? 'Cargando...' : 'Subir Archivo con Cabeceras Revisadas'}
           </button>
