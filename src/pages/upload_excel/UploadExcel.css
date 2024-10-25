@@ -120,13 +120,13 @@
   100% { transform: rotate(360deg); }
 }
 
-.floating-label {
+.floating-excel-label {
   position: relative;
   margin-bottom: 20px;
   width: 100%;
 }
 
-.floating-label input {
+.floating-excel-label input {
   width: 100%;
   box-sizing: border-box;
   padding: 12px 10px;
@@ -137,11 +137,11 @@
   transition: border-color 0.3s ease;
 }
 
-.floating-label input:focus {
+.floating-excel-label input:focus {
   border-color: #28a745; /* Color del borde en foco */
 }
 
-.floating-label label {
+.floating-excel-label label {
   position: absolute;
   top: 50%;
   left: 10px;
@@ -154,8 +154,8 @@
   transition: all 0.3s ease;
 }
 
-.floating-label input:focus + label,
-.floating-label input:not(:placeholder-shown) + label {
+.floating-excel-label input:focus + label,
+.floating-excel-label input:not(:placeholder-shown) + label {
   top: 0;
   left: 10px;
   font-size: 0.85rem;

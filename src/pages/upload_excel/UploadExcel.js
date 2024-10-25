@@ -92,7 +92,7 @@ const UploadExcel = () => {
           <h3>Edita los nombres de las columnas</h3>
           <div className="headers-scroll-container">
             {Object.keys(headers).map((key) => (
-              <div key={key} className="header-input-container floating-label">
+              <div key={key} className="header-input-container floating-excel-label">
                 <input
                   type="text"
                   value={headers[key]}
