@@ -1,102 +1,163 @@
 .upload-excel-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px auto;
-  padding: 40px;
-  border: 1px solid #e0e0e0;
+  max-width: 500px;  /* Aumentamos el ancho para más espacio */
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
-  max-width: 400px;
 }
 
-.headers-scroll-container {
-  display: flex;
-  flex-direction: column; /* Mantiene la disposición vertical */
-  max-height: 200px; /* Altura máxima del contenedor para scroll vertical */
-  overflow-y: auto; /* Permite solo el scroll vertical */
-  overflow-x: hidden; /* Oculta el scroll horizontal */
-  width: 100%;
-  padding: 10px;
+.upload-excel-title {
+  text-align: center;
   margin-bottom: 20px;
+  font-size: 1.8em;
+  color: #333;
 }
 
-
-.header-input {
-  width: calc(100% - 16px); /* Ajuste para evitar desbordamiento */
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 2px solid #007BFF;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.3s;
-}
-
-
-.header-input:focus {
-  border-color: #0056b3;
-  outline: none;
+.upload-excel-form, .headers-edit-form {
+  display: flex;
+  flex-direction: column;
 }
 
 .upload-excel-input {
   margin-bottom: 20px;
-  padding: 12px;
-  border: 2px solid #007BFF;
+  padding: 12px 10px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
   border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
 }
 
 .upload-excel-input:focus {
-  border-color: #0056b3;
+  border-color: #28a745;
+}
+
+.headers-scroll-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 5px; /* Espacio para el scroll */
+  padding-top: 5px; /* Espacio para el scroll */
+}
+
+.header-input-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.header-input {
+  width: 100%;
+  padding: 12px 10px;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
   outline: none;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.header-input:focus {
+  border-color: #28a745;
+  background-color: #fff;
+}
+
+.header-label {
+  position: absolute;
+  top: -8px;
+  left: 15px;
+  background-color: white;
+  padding: 0 5px;
+  font-size: 0.85rem;
+  color: #666;
+  pointer-events: none;
 }
 
 .upload-excel-button {
-  padding: 12px 20px;
-  color: #ffffff;
-  background-color: #007BFF;
   border: none;
   border-radius: 8px;
+  padding: 12px;
   cursor: pointer;
-  font-size: 16px;
   transition: background-color 0.3s, transform 0.2s;
+  background-color: #28a745;
+  color: white;
+  font-size: 1rem;
 }
 
 .upload-excel-button:hover {
-  background-color: #0056b3;
+  background-color: #218838;
   transform: scale(1.05);
-}
-
-.upload-excel-button.loading {
-  background-color: #6c757d;
-  cursor: not-allowed;
 }
 
 .upload-excel-error {
   color: red;
-  margin-top: 15px;
-  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .upload-excel-success {
   color: green;
-  margin-top: 15px;
-  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .spinner {
-  margin-top: 15px;
+  margin: 15px auto;
   width: 24px;
   height: 24px;
-  border: 4px solid rgba(0, 123, 255, 0.3);
+  border: 4px solid rgba(40, 167, 69, 0.3);
   border-radius: 50%;
-  border-top: 4px solid #007BFF;
+  border-top: 4px solid #28a745;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.floating-label {
+  position: relative;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.floating-label input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.floating-label input:focus {
+  border-color: #28a745; /* Color del borde en foco */
+}
+
+.floating-label label {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  background-color: white;
+  padding: 0 5px;
+  color: #999;
+  font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.floating-label input:focus + label,
+.floating-label input:not(:placeholder-shown) + label {
+  top: 0;
+  left: 10px;
+  font-size: 0.85rem;
+  color: #28a745; /* Color del label cuando está enfocado o tiene texto */
 }
