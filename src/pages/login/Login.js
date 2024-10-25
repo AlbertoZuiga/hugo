@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom';
 import { loginRequest, loginSuccess, loginFailure } from '../../redux/actions/authActions';
 import { loginUserApi } from '../../api/loginUserApi'; 
 import './Login.css';
 
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Inicializa useNavigate
+  const navigate = useNavigate();
   const { isLoading, error } = useSelector(state => state.auth);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +21,6 @@ const Login = () => {
       dispatch(loginSuccess({ token, user }));
       console.log('Inicio de sesión exitoso');
 
-      // Redirigir al Home después de un inicio de sesión exitoso
       navigate('/');
     } catch (err) {
       dispatch(loginFailure(err.message));
