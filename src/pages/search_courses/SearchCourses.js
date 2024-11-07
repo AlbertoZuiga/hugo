@@ -14,26 +14,27 @@ const SearchCourses = () => {
   const [loading, setLoading] = useState(true);
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
   const [avoidTimeConflicts, setAvoidTimeConflicts] = useState(false);
-  const [protectedSchedules, setProtectedSchedules] = useState([]); // Nuevo estado para horarios protegidos
-  const [error, setError] = useState(null); // Nuevo estado para errores
-  const [errorPreferences, setErrorPreferences] = useState(null); // Error para las preferencias
+  const [protectedSchedules, setProtectedSchedules] = useState([]);
+  const [error, setError] = useState(null);
+  const [errorPreferences, setErrorPreferences] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Get auth state to check if the user is logged in
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const selectedCourses = useSelector((state) => state.courses.selectedCourses);
   const token = localStorage.getItem("authToken");
 
-  // Agregar temporizador para eliminar el error
   const showErrorTemporarily = (setErrorFunction, message) => {
     setErrorFunction(message);
     setTimeout(() => {
-      setErrorFunction(null); // Limpiar el error después de 5 segundos
+      setErrorFunction(null);
     }, 5000);
   };
 
-  // Fetch courses from the API
   const fetchCourses = useCallback(async () => {
     setLoading(true);
-    setError(null); // Limpiamos el error antes de hacer la solicitud
+    setError(null);
     try {
       const data = await coursesApi(token);
       setCourses(data);
@@ -50,16 +51,12 @@ const SearchCourses = () => {
   }, [token]);
 
   const sendPreferences = async () => {
-    setErrorPreferences(null); // Limpiar el error antes de la solicitud
+    setErrorPreferences(null);
     const preferencesData = {
       permite_solapamiento: avoidTimeConflicts,
-      cursos: selectedCourses.map((course) =>
-        course.id
-      ),
+      cursos: selectedCourses.map((course) => course.id),
       horarios_protegidos: protectedSchedules,
     };
-    console.log(preferencesData)
-    console.log(protectedSchedules)
 
     try {
       const response = await schedulesApi(token, preferencesData);
@@ -75,16 +72,13 @@ const SearchCourses = () => {
     }
   };
 
-  // Validate and update selected courses
   const validateSelectedCourses = (data) => {
     const validSelectedCourses = selectedCourses.filter((selectedCourse) =>
       data.some((apiCourse) => apiCourse.url === selectedCourse.url)
     );
 
     if (validSelectedCourses.length !== selectedCourses.length) {
-      // Despachar cursos válidos
       validSelectedCourses.forEach((course) => dispatch(addCourse(course)));
-      // Remover cursos inválidos
       const invalidCourses = selectedCourses.filter(
         (selectedCourse) => !validSelectedCourses.includes(selectedCourse)
       );
@@ -92,28 +86,22 @@ const SearchCourses = () => {
     }
   };
 
-  // Handle course selection
   const handleCourseClick = (course) => {
     if (selectedCourses.some((selected) => selected.url === course.url)) {
-      // Deseleccionar el curso si ya está seleccionado
       dispatch(removeCourse(course));
     } else {
-      // Seleccionar el curso si no está seleccionado
       dispatch(addCourse(course));
     }
   };
 
-  // Toggle view between selected and all courses
   const toggleView = () => {
     setShowSelectedOnly((prev) => !prev);
   };
 
-  // Handle checkbox change
   const handleCheckboxChange = () => {
     setAvoidTimeConflicts((prev) => !prev);
   };
 
-  // Actualiza los horarios protegidos cuando cambian
   const handleProtectedScheduleChange = (formattedProtectedSchedules) => {
     setProtectedSchedules(formattedProtectedSchedules);
   };
@@ -124,6 +112,15 @@ const SearchCourses = () => {
 
   return (
     <div className="course-selection">
+      {isAuthenticated && (
+        <button
+          onClick={() => navigate("/crud-courses")}
+          className="crud-button"
+        >
+          Gestionar Ramos (CRUD)
+        </button>
+      )}
+      
       {error && (
         <p className={`error-message ${error ? "" : "hidden"}`}>{error}</p>
       )}

@@ -19,15 +19,13 @@ const Navbar = () => {
       <Link to="/" className="navbar-logo">HUGO</Link>
       <ul className="navbar-links">
         <li><Link to="/search-courses">Buscar Ramos</Link></li>
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <>
             <li><Link to="/upload-excel">Subir Excel</Link></li>
             <li>
               <button onClick={handleLogout} className="logout-button">Log out</button>
             </li>
           </>
-        ) : (
-          <li><Link to="/login">Iniciar Sesión</Link></li>
         )}
       </ul>
     </nav>

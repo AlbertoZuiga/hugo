@@ -198,3 +198,18 @@ input:checked + .slider:before {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+.crud-button {
+  background-color: #007bff; /* Color azul */
+  color: white; /* Texto blanco */
+  padding: 10px 15px; /* Espaciado interno */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados */
+  cursor: pointer; /* Cambiar cursor al pasar el mouse */
+  font-size: 16px; /* Tamaño de fuente */
+  margin-bottom: 20px; /* Espacio inferior */
+  transition: background-color 0.3s; /* Transición suave */
+}
+
+.crud-button:hover {
+  background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
+}
