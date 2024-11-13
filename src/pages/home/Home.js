@@ -202,6 +202,7 @@ const Home = () => {
   return (
     <div>
       <h1>Horarios Generados</h1>
+      <h6>*para agregar ramos vaya a la pestaña "Buscar Ramos"</h6>
 
       {/* Dropdown para seleccionar el horario */}
       <label htmlFor="schedule-select">Selecciona un Horario:</label>

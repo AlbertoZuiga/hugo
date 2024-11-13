@@ -136,7 +136,9 @@ const SearchCourses = () => {
           ? "Mostrar Todos los Ramos"
           : "Mostrar Ramos Seleccionados"}
       </button>
-
+          <h6>1) Para seleccionar un ramo haga click en él</h6>
+          <h6>2) Luego haga click en "Mostrar Ramos Seleccionados"</h6>
+          <h6>3) Finalmente elija sus preferencias y haga click en "Enviar Preferencias"</h6>
       {showSelectedOnly ? (
         <>
           <button onClick={sendPreferences} className="toggle-view-button">
