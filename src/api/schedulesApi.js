@@ -5,7 +5,6 @@ export const schedulesApi = async (token, formData) => {
   try {
     const response = await axios.post(`http://localhost:8000/get_horarios/`, formData, {
       headers: {
-        Authorization: `Token ${token}`,
         'Content-Type': 'application/json',
       },
     });
