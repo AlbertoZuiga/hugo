@@ -36,7 +36,7 @@ const SearchCourses = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await coursesApi(token);
+      const data = await coursesApi();
       setCourses(data);
       validateSelectedCourses(data);
     } catch (error) {

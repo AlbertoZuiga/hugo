@@ -1,11 +1,10 @@
 import axios from 'axios';
 
 // Función para obtener horarios con los datos proporcionados
-export const schedulesApi = async (token, formData) => {
+export const schedulesApi = async (formData) => {
   try {
     const response = await axios.post(`http://localhost:8000/get_horarios/`, formData, {
       headers: {
-        Authorization: `Token ${token}`,
         'Content-Type': 'application/json',
       },
     });

@@ -1,10 +1,9 @@
 import axios from "axios";
 
-export const coursesApi = async (token) => {
+export const coursesApi = async () => {
   try {
     const response = await axios.get(`http://localhost:8000/cursos/`, {
       headers: {
-        Authorization: `Token ${token}`,
         "Content-Type": "multipart/form-data", // Asegúrate de que sea necesario
       },
     });

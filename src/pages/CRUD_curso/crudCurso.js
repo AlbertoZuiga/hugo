@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import axios from "axios";
-import "./CRUDAdmin.css";
+import "./crudCurso.css";
 
 // Configurar el interceptor de Axios para agregar el token en cada solicitud
 axios.interceptors.request.use(
@@ -14,7 +16,17 @@ axios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-const CRUDAdmin = () => {
+const CrudCurso = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const navigate = useNavigate();
+
+  // Ensure redirection happens only once after mounting, not on every render
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
   const [courses, setCourses] = useState([]);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -162,4 +174,4 @@ const CRUDAdmin = () => {
   );
 };
 
-export default CRUDAdmin;
+export default CrudCurso;

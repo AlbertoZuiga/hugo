@@ -1,0 +1,167 @@
+.crud-admin-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  font-family: "Roboto", sans-serif;
+}
+
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Formulario en dos filas */
+.section-form {
+  display: flex;
+  flex-direction: column;  /* Alinea los elementos en columnas */
+  gap: 20px;  /* Espacio entre las filas */
+  margin-bottom: 30px;
+}
+
+.section-form .row {
+  display: flex;
+  justify-content: space-between; /* Alinea los campos en una fila */
+  gap: 20px;  /* Espacio entre los campos */
+}
+
+.section-form input,
+.section-form select {
+  padding: 12px 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  flex-grow: 1;  /* Los campos se expanden para llenar el espacio disponible */
+}
+
+.section-form input:focus,
+.section-form select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* El primer campo NRC y el profesor ocupan un 45% cada uno de la fila */
+.section-form .nrc,
+.section-form .profesor {
+  flex: 1 1 45%;
+}
+
+/* Los campos del curso y el botón ocupan el 100% de la fila siguiente */
+.section-form .curso,
+.submit-button {
+  flex: 1 1 100%;
+}
+
+/* Estilos del botón */
+.submit-button {
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;  /* Asegura que el botón ocupe todo el ancho */
+  margin-top: 20px;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+/* Tabla */
+.section-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.section-table th,
+.section-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.section-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.section-table tr:nth-child(even) {
+  background-color: #f7f9fc;
+}
+
+.section-table tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.edit-button,
+.delete-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button {
+  background-color: #28a745;
+}
+
+.edit-button:hover {
+  background-color: #218838;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  margin-left: 8px;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+.section-form input:not([type='number']),
+.section-form select:not([type='number']) {
+  padding: 12px 20px; /* Espaciado dentro de los campos */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  flex-grow: 1;  /* Los campos se expanden para llenar el espacio disponible */
+  height: 48px;  /* Asignamos la misma altura para ambos campos */
+}
+
+.section-form input:not([type='number']):focus,
+.section-form select:not([type='number']):focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+@media screen and (max-width: 768px) {
+  .section-form {
+    flex-direction: column; /* En dispositivos pequeños, los campos se apilan en una columna */
+    width: 100%; /* Asegura que el formulario ocupe todo el ancho */
+  }
+
+  .section-form .nrc,
+  .section-form .profesor,
+  .section-form .curso {
+    flex: 1 1 100%; /* Los campos ocupan todo el ancho en pantallas pequeñas */
+  }
+
+  .submit-button {
+    width: 100%; /* Asegura que el botón ocupe todo el ancho */
+  }
+}

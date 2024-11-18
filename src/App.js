@@ -9,7 +9,9 @@ import Home from "./pages/home/Home";
 import SearchCourses from "./pages/search_courses/SearchCourses";
 import Login from "./pages/login/Login";
 import UploadExcel from "./pages/upload_excel/UploadExcel";
-import CRUDAdmin from "./components/CRUD_Admin/CRUDAdmin";
+import CrudCurso from "./pages/CRUD_curso/crudCurso";
+import CrudSeccion from "./pages/CRUD_seccion/crudSeccion";
+import CrudProfesor from "./pages/CRUD_profesor/crudProfesor"
 
 const App = () => {
   return (
@@ -29,7 +31,9 @@ const App = () => {
               <Route path="/search-courses" element={<SearchCourses />} />
               <Route path="/login" element={<Login />} />
               <Route path="/upload-excel" element={<UploadExcel />} />
-              <Route path="/crud-courses" element={<CRUDAdmin />} />
+              <Route path="/crud-curso" element={<CrudCurso />} />
+              <Route path="/crud-seccion" element={<CrudSeccion />} />
+              <Route path="/crud-profesor" element={<CrudProfesor />} />
             </Routes>
           </main>
           <Footer />

@@ -22,6 +22,9 @@ const Navbar = () => {
         {isAuthenticated && (
           <>
             <li><Link to="/upload-excel">Subir Excel</Link></li>
+            <li><Link to="/crud-curso">Gestionar ramos</Link></li>
+            <li><Link to="/crud-profesor">Gestionar profesores</Link></li>
+            <li><Link to="/crud-seccion">Gestionar secciones</Link></li>
             <li>
               <button onClick={handleLogout} className="logout-button">Log out</button>
             </li>
