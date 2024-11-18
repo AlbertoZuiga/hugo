@@ -213,3 +213,82 @@ input:checked + .slider:before {
 .crud-button:hover {
   background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
 }
+
+/* Botón de obligatorio */
+.obligatory-button {
+  background-color: #ff9800; /* Naranja */
+  color: white; /* Texto blanco */
+  padding: 10px 15px; /* Espaciado interno */
+  border: none; /* Sin borde */
+  border-radius: 5px; /* Bordes redondeados */
+  cursor: pointer; /* Cursor de mano */
+  font-size: 16px; /* Tamaño de fuente */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Transición suave */
+  margin-top: 10px; /* Espacio superior */
+}
+
+.obligatory-button:hover {
+  background-color: #f57c00; /* Naranja más oscuro al pasar el mouse */
+  transform: scale(1.05); /* Efecto de aumento en tamaño al pasar el mouse */
+}
+
+.obligatory-button.selected {
+  background-color: #f57c00; /* Cambia a un naranja más oscuro si está seleccionado */
+  font-weight: bold; /* Pone el texto en negrita */
+  color: #fff; /* Mantiene el texto blanco */
+}
+
+/* Estilo para todos los botones de acción */
+button {
+  background-color: #28a745; /* Verde */
+  color: white; /* Texto blanco */
+  padding: 12px 20px; /* Tamaño consistente */
+  border: none; /* Sin borde */
+  border-radius: 8px; /* Bordes redondeados */
+  font-size: 16px; /* Tamaño de fuente */
+  cursor: pointer; /* Cursor de mano */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Transición para el cambio de color */
+}
+
+button:hover {
+  background-color: #218838; /* Verde más oscuro al pasar el mouse */
+  transform: scale(1.05); /* Aumento de tamaño */
+}
+
+button:disabled {
+  background-color: #ccc; /* Fondo gris cuando está deshabilitado */
+  cursor: not-allowed; /* Cursor de no permitido */
+}
+
+/* Botón de "Enviar Preferencias" */
+.toggle-view-button {
+  background-color: #007bff; /* Azul */
+}
+
+.toggle-view-button:hover {
+  background-color: #0056b3; /* Azul oscuro */
+}
+
+/* Botón de "Gestionar Ramos (CRUD)" */
+.crud-button {
+  background-color: #ff5733; /* Rojo */
+}
+
+.crud-button:hover {
+  background-color: #c1351d; /* Rojo oscuro */
+}
+
+.selected-course-item.obligatory {
+  background-color: #ffecb3; /* Fondo amarillo claro para cursos obligatorios */
+  border: 2px solid #ff9800; /* Borde naranja para destacar el curso obligatorio */
+}
+
+.selected-course-item.obligatory h3 {
+  font-weight: bold; /* Texto en negrita */
+  color: #ff9800; /* Color de texto naranja */
+}
+
+button:focus, input:focus {
+  outline: 3px solid #28a745; /* Borde verde al enfocar */
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Sombra verde para enfoque */
+}

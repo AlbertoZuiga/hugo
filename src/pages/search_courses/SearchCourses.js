@@ -17,6 +17,9 @@ const SearchCourses = () => {
   const [protectedSchedules, setProtectedSchedules] = useState([]);
   const [error, setError] = useState(null);
   const [errorPreferences, setErrorPreferences] = useState(null);
+  const [minimoNCursos, setMinimoNCursos] = useState(2); // Valor mínimo de cursos
+  const [maxNCreditos, setMaxNCreditos] = useState(30); // Valor máximo de créditos
+  const [cursosObligatorios, setCursosObligatorios] = useState([]); // Lista de cursos obligatorios
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,14 +55,36 @@ const SearchCourses = () => {
 
   const sendPreferences = async () => {
     setErrorPreferences(null);
+  
+    // Estructura de los datos que se enviarán al backend
     const preferencesData = {
-      permite_solapamiento: avoidTimeConflicts,
-      cursos: selectedCourses.map((course) => course.id),
-      horarios_protegidos: protectedSchedules,
+      "cursos": selectedCourses.map((course) => course.id), // IDs de los cursos seleccionados
+      "permite_solapamiento": avoidTimeConflicts, // Evitar topes de horarios
+      "horarios_protegidos": protectedSchedules, // Horarios protegidos
+      "cursos_obligatorios": cursosObligatorios, // Cursos obligatorios
+      "minimo_n_cursos": minimoNCursos, // Mínimo de cursos
+      "max_n_creditos": maxNCreditos, // Máximo de créditos
     };
-
+  
+    // Depuración: Verifica que el objeto preferencesData esté correctamente estructurado
+    console.log("Datos enviados al backend:", preferencesData);
+  
+    // Verificar si alguno de los valores importantes está vacío o no definido
+    if (
+      !preferencesData.cursos.length ||
+      !preferencesData.cursos_obligatorios.length ||
+      preferencesData.minimo_n_cursos === undefined ||
+      preferencesData.max_n_creditos === undefined
+    ) {
+      showErrorTemporarily(
+        setErrorPreferences,
+        "Por favor, complete todos los campos requeridos."
+      );
+      return;
+    }
+  
     try {
-      const response = await schedulesApi(token, preferencesData);
+      const response = await schedulesApi(preferencesData);
       console.log("Preferencias enviadas al backend:", response);
       dispatch(setSchedules(response.data));
       navigate("/");
@@ -70,7 +95,7 @@ const SearchCourses = () => {
         "Ocurrió un error al enviar las preferencias. Inténtalo más tarde."
       );
     }
-  };
+  };  
 
   const validateSelectedCourses = (data) => {
     const validSelectedCourses = selectedCourses.filter((selectedCourse) =>
@@ -106,6 +131,15 @@ const SearchCourses = () => {
     setProtectedSchedules(formattedProtectedSchedules);
   };
 
+  // Agregar o quitar cursos obligatorios
+  const toggleObligatoryCourse = (courseId) => {
+    setCursosObligatorios((prev) =>
+      prev.includes(courseId)
+        ? prev.filter((id) => id !== courseId)
+        : [...prev, courseId]
+    );
+  };
+
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
@@ -136,9 +170,10 @@ const SearchCourses = () => {
           ? "Mostrar Todos los Ramos"
           : "Mostrar Ramos Seleccionados"}
       </button>
-          <h6>1) Para seleccionar un ramo haga click en él</h6>
-          <h6>2) Luego haga click en "Mostrar Ramos Seleccionados"</h6>
-          <h6>3) Finalmente elija sus preferencias y haga click en "Enviar Preferencias"</h6>
+      <h6>1) Para seleccionar un ramo haga click en él</h6>
+      <h6>2) Luego haga click en "Mostrar Ramos Seleccionados"</h6>
+      <h6>3) Finalmente elija sus preferencias y haga click en "Enviar Preferencias"</h6>
+
       {showSelectedOnly ? (
         <>
           <button onClick={sendPreferences} className="toggle-view-button">
@@ -156,6 +191,29 @@ const SearchCourses = () => {
             </label>
           </div>
 
+          {/* Nuevos campos */}
+          <div>
+            <label htmlFor="minimoNCursos">Mínimo de cursos:</label>
+            <input
+              type="number"
+              id="minimoNCursos"
+              value={minimoNCursos}
+              onChange={(e) => setMinimoNCursos(Number(e.target.value))}
+              min="1"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="maxNCreditos">Máximo de créditos:</label>
+            <input
+              type="number"
+              id="maxNCreditos"
+              value={maxNCreditos}
+              onChange={(e) => setMaxNCreditos(Number(e.target.value))}
+              min="1"
+            />
+          </div>
+
           <div className="selected-courses">
             <h2>Ramos seleccionados:</h2>
             {selectedCourses.length > 0 ? (
@@ -168,6 +226,14 @@ const SearchCourses = () => {
                     onClick={() => handleCourseClick(course)}
                   >
                     Deseleccionar
+                  </button>
+                  <button
+                    onClick={() => toggleObligatoryCourse(course.id)}
+                    className="obligatory-button"
+                  >
+                    {cursosObligatorios.includes(course.id)
+                      ? "Eliminar de obligatorios"
+                      : "Marcar como obligatorio"}
                   </button>
                 </div>
               ))
