@@ -19,6 +19,21 @@ const timeSlots = [
   { start: "20:30", end: "21:20" },
 ];
 
+// Función para verificar si dos bloques de tiempo se superponen
+const isTimeOverlap = (start1, end1, start2, end2) => {
+  const [startHour1, startMinute1] = start1.split(":").map(Number);
+  const [endHour1, endMinute1] = end1.split(":").map(Number);
+  const [startHour2, startMinute2] = start2.split(":").map(Number);
+  const [endHour2, endMinute2] = end2.split(":").map(Number);
+
+  const start1Min = startHour1 * 60 + startMinute1;
+  const end1Min = endHour1 * 60 + endMinute1;
+  const start2Min = startHour2 * 60 + startMinute2;
+  const end2Min = endHour2 * 60 + endMinute2;
+
+  return start1Min < end2Min && start2Min < end1Min;
+};
+
 // Definimos las clases numéricas para los cursos
 const courseClassMapping = {};
 
@@ -43,6 +58,120 @@ const Home = () => {
   const specialEvents = schedule.filter(
     (bloque) => !["CLAS", "AYUD", "LABT"].includes(bloque.tipo)
   );
+
+  // Función para asignar un color único a cada curso basado en su nombre
+  const getCourseColor = (courseName) => {
+    const hash = Array.from(courseName).reduce((hash, char) => {
+      return hash + char.charCodeAt(0);
+    }, 0);
+    const colors = [
+      "course-1", "course-2", "course-3", "course-4", 
+      "course-5", "course-6", "course-7"
+    ];
+    return colors[hash % colors.length]; // Asigna un color basado en el hash
+  };
+
+  // Función para obtener la clase de tipo de clase (A, L, C)
+  const getClassTypeClass = (tipo) => {
+    if (tipo.startsWith("A")) {
+      return "type-A";
+    } else if (tipo.startsWith("L")) {
+      return "type-L";
+    } else if (tipo.startsWith("C")) {
+      return "type-C";
+    }
+    return ""; // Si no es A, L o C
+  };
+
+  // Función para verificar si un curso está en el rango de un bloque de tiempo
+  const isTimeWithinSlot = (startTime, endTime, slotStart, slotEnd) => {
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+    const [slotStartHour, slotStartMinute] = slotStart.split(":").map(Number);
+    const [slotEndHour, slotEndMinute] = slotEnd.split(":").map(Number);
+
+    const courseStart = startHour * 60 + startMinute;
+    const courseEnd = endHour * 60 + endMinute;
+    const slotStartMin = slotStartHour * 60 + slotStartMinute;
+    const slotEndMin = slotEndHour * 60 + slotEndMinute;
+
+    return courseStart < slotEndMin && courseEnd > slotStartMin;
+  };
+
+  // Función para encontrar cursos que se superponen
+  const findOverlappingCourses = (courses) => {
+    const overlapping = [];
+    for (let i = 0; i < courses.length; i++) {
+      const bloque1 = courses[i];
+      for (let j = i + 1; j < courses.length; j++) {
+        const bloque2 = courses[j];
+        if (
+          isTimeOverlap(
+            bloque1.hora_inicio,
+            bloque1.hora_fin,
+            bloque2.hora_inicio,
+            bloque2.hora_fin
+          )
+        ) {
+          overlapping.push(bloque1.nrc, bloque2.nrc);
+        }
+      }
+    }
+    return overlapping;
+  };
+
+  // Función para renderizar la información de cada curso
+  const renderCourseInfo = (daySchedule, slot) => {
+    const courses = daySchedule.filter((bloque) =>
+      isTimeWithinSlot(bloque.hora_inicio, bloque.hora_fin, slot.start, slot.end)
+    );
+
+    if (courses.length === 0) {
+      return ""; // No hay cursos en este bloque de tiempo
+    }
+
+    const overlappingCourses = findOverlappingCourses(courses);
+
+    return courses.map((bloque, index) => {
+      const isOverlapping = overlappingCourses.includes(bloque.nrc);
+      const courseColorClass = getCourseColor(bloque.nombre_curso);
+      const courseTypeClass = getClassTypeClass(bloque.tipo);
+
+      return (
+        <div
+          key={index}
+          className={`${courseColorClass} ${courseTypeClass} ${isOverlapping ? "conflict" : ""}`}
+        >
+          <div className="course-name">{bloque.nombre_curso}</div>
+          <div className="course-nrc">NRC: {bloque.nrc}</div>
+          <div className="course-sala">Sala: {bloque.sala}</div>
+          <div className="course-tipo">{bloque.tipo}</div>
+        </div>
+      );
+    });
+  };
+
+  // Renderizar eventos especiales
+  const renderSpecialEvents = () => {
+    return (
+      <div className="special-events">
+        <h2>Eventos Especiales</h2>
+        {specialEvents.length > 0 ? (
+          specialEvents.map((evento, index) => (
+            <div key={index} className="event-item">
+              <h3>{evento.nombre_curso} (NRC: {evento.nrc})</h3>
+              <p><strong>Tipo:</strong> {evento.tipo}</p>
+              <p><strong>Fecha:</strong> {evento.fecha_inicio} - {evento.fecha_fin}</p>
+              <p><strong>Hora:</strong> {evento.hora_inicio} - {evento.hora_fin}</p>
+              <p><strong>Sala:</strong> {evento.sala}</p>
+            </div>
+          ))
+        ) : (
+          <p>No hay eventos especiales para mostrar.</p>
+        )}
+      </div>
+    );
+  };
 
   const renderSchedule = () => {
     // Organizar los bloques por día de la semana
@@ -73,9 +202,7 @@ const Home = () => {
         <tbody>
           {timeSlots.map((slot, rowIndex) => (
             <tr key={rowIndex}>
-              <td>
-                <div>{`${slot.start} - ${slot.end}`}</div>
-              </td>
+              <td>{`${slot.start} - ${slot.end}`}</td>
               <td>{renderCourseInfo(daysOfWeek[1], slot)}</td>
               <td>{renderCourseInfo(daysOfWeek[2], slot)}</td>
               <td>{renderCourseInfo(daysOfWeek[3], slot)}</td>
@@ -88,122 +215,9 @@ const Home = () => {
     );
   };
 
-  const renderCourseInfo = (daySchedule, slot) => {
-    const courses = daySchedule.filter((bloque) =>
-      isTimeWithinSlot(bloque.hora_inicio, bloque.hora_fin, slot.start, slot.end)
-    );
-
-    if (courses.length === 0) {
-      return ""; // No hay cursos en este bloque de tiempo
-    }
-
-    const overlappingCourses = findOverlappingCourses(courses);
-
-    return courses.map((bloque, index) => {
-      const isOverlapping = overlappingCourses.includes(bloque.nrc);
-      const courseClass = getCourseClass(bloque.nombre_curso);
-
-      return (
-        <div
-          key={index}
-          className={`${courseClass} ${isOverlapping ? "conflict" : ""}`}
-        >
-          <div className="course-name">{bloque.nombre_curso}</div>
-          <div className="course-nrc">NRC: {bloque.nrc}</div>
-          <div className="course-sala">Sala: {bloque.sala}</div>
-          <div className="course-tipo">{bloque.tipo}</div>
-        </div>
-      );
-    });
-  };
-
-  const renderSpecialEvents = () => {
-    return (
-      <div className="special-events">
-        <h2>Eventos Especiales</h2>
-        {specialEvents.map((evento, index) => (
-          <div key={index} className="event-item">
-            <h3>{evento.nombre_curso} (NRC: {evento.nrc})</h3>
-            <p>
-              <strong>Tipo:</strong> {evento.tipo}
-            </p>
-            <p>
-              <strong>Fecha:</strong> {evento.fecha_inicio} - {evento.fecha_fin}
-            </p>
-            <p>
-              <strong>Hora:</strong> {evento.hora_inicio} - {evento.hora_fin}
-            </p>
-            <p>
-              <strong>Sala:</strong> {evento.sala}
-            </p>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const isTimeWithinSlot = (startTime, endTime, slotStart, slotEnd) => {
-    const [startHour, startMinute] = startTime.split(":").map(Number);
-    const [endHour, endMinute] = endTime.split(":").map(Number);
-    const [slotStartHour, slotStartMinute] = slotStart.split(":").map(Number);
-    const [slotEndHour, slotEndMinute] = slotEnd.split(":").map(Number);
-
-    const courseStart = startHour * 60 + startMinute;
-    const courseEnd = endHour * 60 + endMinute;
-    const slotStartMin = slotStartHour * 60 + slotStartMinute;
-    const slotEndMin = slotEndHour * 60 + slotEndMinute;
-
-    return courseStart < slotEndMin && courseEnd > slotStartMin;
-  };
-
-  const findOverlappingCourses = (courses) => {
-    const overlapping = [];
-    for (let i = 0; i < courses.length; i++) {
-      const bloque1 = courses[i];
-      for (let j = i + 1; j < courses.length; j++) {
-        const bloque2 = courses[j];
-        if (
-          isTimeOverlap(
-            bloque1.hora_inicio,
-            bloque1.hora_fin,
-            bloque2.hora_inicio,
-            bloque2.hora_fin
-          )
-        ) {
-          overlapping.push(bloque1.nrc, bloque2.nrc);
-        }
-      }
-    }
-    return overlapping;
-  };
-
-  const isTimeOverlap = (start1, end1, start2, end2) => {
-    const [startHour1, startMinute1] = start1.split(":").map(Number);
-    const [endHour1, endMinute1] = end1.split(":").map(Number);
-    const [startHour2, startMinute2] = start2.split(":").map(Number);
-    const [endHour2, endMinute2] = end2.split(":").map(Number);
-
-    const start1Min = startHour1 * 60 + startMinute1;
-    const end1Min = endHour1 * 60 + endMinute1;
-    const start2Min = startHour2 * 60 + startMinute2;
-    const end2Min = endHour2 * 60 + endMinute2;
-
-    return start1Min < end2Min && start2Min < end1Min;
-  };
-
-  const getCourseClass = (courseName) => {
-    if (!courseClassMapping[courseName]) {
-      const nextClassNumber = Object.keys(courseClassMapping).length + 1;
-      courseClassMapping[courseName] = `course course-${nextClassNumber}`;
-    }
-    return courseClassMapping[courseName];
-  };
-
   return (
     <div>
       <h1>Horarios Generados</h1>
-      <h6>*para agregar ramos vaya a la pestaña "Buscar Ramos"</h6>
-
       {/* Dropdown para seleccionar el horario */}
       <label htmlFor="schedule-select">Selecciona un Horario:</label>
       <select
@@ -225,7 +239,7 @@ const Home = () => {
       {/* Mostrar el horario semanal en formato tabla */}
       {renderSchedule()}
 
-      {/* Mostrar eventos especiales en una lista */}
+      {/* Mostrar eventos especiales */}
       {renderSpecialEvents()}
     </div>
   );

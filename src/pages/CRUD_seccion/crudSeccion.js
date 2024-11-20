@@ -29,6 +29,7 @@ const CrudSeccion = () => {
   }, [isAuthenticated, navigate]);
 
   const [courses, setCourses] = useState([]);
+  console.log(courses)
   const [professors, setProfessors] = useState([]);
   const [sections, setSections] = useState([]);
   const [formData, setFormData] = useState({
@@ -77,36 +78,41 @@ const CrudSeccion = () => {
   };
 
   const handleAddSection = async () => {
-    console.log("URL Profesor:", `http://localhost:8000/profesores/${formData.profesor}/`);
+    console.log(
+      "URL Profesor:",
+      `http://localhost:8000/profesores/${formData.profesor}/`
+    );
 
     try {
-        // Construir URLs completas para profesor y curso
-        const { nrc, profesor, curso } = formData;
-        if (!nrc || !profesor || !curso) {
-            alert("Por favor completa todos los campos.");
-            return;
-        }
+      // Construir URLs completas para profesor y curso
+      const { nrc, profesor, curso } = formData;
+      if (!nrc || !profesor || !curso) {
+        alert("Por favor completa todos los campos.");
+        return;
+      }
 
-        const dataToSend = {
-          nrc,
-          profesor,
-          curso: `http://localhost:8000/cursos/${curso}/`,
-        };
+      const dataToSend = {
+        nrc,
+        profesor,
+        curso: curso,
+      };
 
-        console.log("Datos enviados:", dataToSend); // Depuración
-        await axios.post("http://localhost:8000/secciones/", dataToSend);
-        fetchSections();
-        resetForm();
+      console.log("Datos enviados:", dataToSend); // Depuración
+      await axios.post("http://localhost:8000/secciones/", dataToSend);
+      fetchSections();
+      resetForm();
     } catch (error) {
-        console.error("Error al agregar sección:", error.response?.data || error.message);
+      console.error(
+        "Error al agregar sección:",
+        error.response?.data || error.message
+      );
     }
   };
-
 
   const handleEditSection = async () => {
     try {
       const { nrc, profesor, curso } = formData;
-      console.log(profesor)
+      console.log(profesor);
       if (!nrc || !profesor || !curso) {
         alert("Por favor completa todos los campos.");
         return;
@@ -120,8 +126,8 @@ const CrudSeccion = () => {
 
       await axios.put(`http://localhost:8000/secciones/${nrc}/`, dataToSend, {
         headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'multipart/form-data',
+          Authorization: `Token ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
       fetchSections();
@@ -136,8 +142,8 @@ const CrudSeccion = () => {
     try {
       await axios.delete(`http://localhost:8000/secciones/${id}/`, {
         headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'multipart/form-data',
+          Authorization: `Token ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
       fetchSections();
@@ -155,67 +161,77 @@ const CrudSeccion = () => {
     setEditMode(false);
   };
 
+  const getProfessorName = (professorId) => {
+    const professor = professors.find((prof) => prof.id === professorId);
+    return professor ? professor.nombre : "Desconocido";
+  };
+  
+  const getCourseName = (courseId) => {
+    const course = courses.find((course) => course.id === courseId);
+    return course ? course.nombre : "Desconocido";
+  };
+
   return (
     <div className="crud-admin-container">
       <h2>Gestionar Secciones</h2>
       <form
-  className="section-form"
-  onSubmit={(e) => {
-    e.preventDefault();
-    editMode ? handleEditSection() : handleAddSection();
-  }}
->
-  {/* Fila para NRC y Profesor */}
-  <div className="row">
-    <input
-      className="nrc"
-      type="number"
-      name="nrc"
-      placeholder="NRC"
-      value={formData.nrc}
-      onChange={handleChange}
-      required
-    />
+        className="section-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          editMode ? handleEditSection() : handleAddSection();
+        }}
+      >
+        {/* Fila para NRC y Profesor */}
+        <div className="row">
+          <input
+            className="nrc"
+            type="number"
+            name="nrc"
+            placeholder="NRC"
+            value={formData.nrc}
+            onChange={handleChange}
+            required
+          />
 
-    <select
-      className="profesor"
-      name="profesor"
-      value={formData.profesor}
-      onChange={handleChange}
-      required
-    >
-      <option value="">Seleccionar Profesor</option>
-      {professors.map((professor) => (
-        <option key={professor.url} value={professor.url}>
-          {professor.nombre}
-        </option>
-      ))}
-    </select>
-  </div>
+          <select
+            className="profesor"
+            name="profesor"
+            value={formData.profesor}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccionar Profesor</option>
+            {professors.map((professor) => (
+              <option key={professor.url} value={professor.id}>
+                {professor.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
 
-  {/* Fila para Curso */}
-  <div className="row">
-    <select
-      className="curso"
-      name="curso"
-      value={formData.curso}
-      onChange={handleChange}
-      required
-    >
-      <option value="">Seleccionar Curso</option>
-      {courses.map((course) => (
-        <option key={course.id} value={course.id}>
-          {course.nombre}
-        </option>
-      ))}
-    </select>
-  </div>
+        {/* Fila para Curso */}
+        <div className="row">
+          <select
+            className="curso"
+            name="curso"
+            value={formData.curso}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccionar Curso</option>
+            {courses.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
 
-  {/* Botón */}
-  <button type="submit" className="submit-button">
-    {editMode ? "Actualizar" : "Agregar"} Sección
-  </button>
-</form>
+        {/* Botón */}
+        <button type="submit" className="submit-button">
+          {editMode ? "Actualizar" : "Agregar"} Sección
+        </button>
+      </form>
 
       <table className="section-table">
         <thead>
@@ -230,14 +246,14 @@ const CrudSeccion = () => {
           {sections.map((section) => (
             <tr key={section.id}>
               <td>{section.nrc}</td>
-              <td>{section.profesor}</td>
-              <td>{section.curso}</td>
+              <td>{getProfessorName(section.profesor)}</td>
+              <td>{getCourseName(section.curso)}</td>
               <td>
                 <button
                   className="edit-button"
                   onClick={() => {
                     setFormData({
-                      nrc: section.nrc, 
+                      nrc: section.nrc,
                       profesor: section.profesor.split("/").slice(-2, -1)[0],
                       curso: section.curso.split("/").slice(-2, -1)[0],
                     });
