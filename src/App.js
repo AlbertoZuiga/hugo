@@ -12,6 +12,7 @@ import UploadExcel from "./pages/upload_excel/UploadExcel";
 import CrudCurso from "./pages/CRUD_curso/crudCurso";
 import CrudSeccion from "./pages/CRUD_seccion/crudSeccion";
 import CrudProfesor from "./pages/CRUD_profesor/crudProfesor"
+import CrudBloque from "./pages/CRUD_bloque/crudBloque";
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
               <Route path="/crud-curso" element={<CrudCurso />} />
               <Route path="/crud-seccion" element={<CrudSeccion />} />
               <Route path="/crud-profesor" element={<CrudProfesor />} />
+              <Route path="/crud-bloque" element={<CrudBloque />} />
             </Routes>
           </main>
           <Footer />

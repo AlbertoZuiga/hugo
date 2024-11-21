@@ -69,19 +69,6 @@ const SearchCourses = () => {
     // Depuración: Verifica que el objeto preferencesData esté correctamente estructurado
     console.log("Datos enviados al backend:", preferencesData);
   
-    // Verificar si alguno de los valores importantes está vacío o no definido
-    if (
-      !preferencesData.cursos.length ||
-      !preferencesData.cursos_obligatorios.length ||
-      preferencesData.minimo_n_cursos === undefined ||
-      preferencesData.max_n_creditos === undefined
-    ) {
-      showErrorTemporarily(
-        setErrorPreferences,
-        "Por favor, complete todos los campos requeridos."
-      );
-      return;
-    }
   
     try {
       const response = await schedulesApi(preferencesData);
@@ -191,7 +178,6 @@ const SearchCourses = () => {
             </label>
           </div>
 
-          {/* Nuevos campos */}
           <div>
             <label htmlFor="minimoNCursos">Mínimo de cursos:</label>
             <input
