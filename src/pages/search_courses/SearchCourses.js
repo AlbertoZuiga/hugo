@@ -17,16 +17,16 @@ const SearchCourses = () => {
   const [protectedSchedules, setProtectedSchedules] = useState([]);
   const [error, setError] = useState(null);
   const [errorPreferences, setErrorPreferences] = useState(null);
-  const [minimoNCursos, setMinimoNCursos] = useState(2); // Valor mínimo de cursos
-  const [maxNCreditos, setMaxNCreditos] = useState(30); // Valor máximo de créditos
-  const [cursosObligatorios, setCursosObligatorios] = useState([]); // Lista de cursos obligatorios
+  const [minimoNCursos, setMinimoNCursos] = useState(2);
+  const [maxNCreditos, setMaxNCreditos] = useState(30);
+  const [cursosObligatorios, setCursosObligatorios] = useState([]);
+  const [expandedCourseId, setExpandedCourseId] = useState(null);
+  const [courseDetailsMap, setCourseDetailsMap] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Get auth state to check if the user is logged in
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const selectedCourses = useSelector((state) => state.courses.selectedCourses);
-  const token = localStorage.getItem("authToken");
 
   const showErrorTemporarily = (setErrorFunction, message) => {
     setErrorFunction(message);
@@ -51,28 +51,39 @@ const SearchCourses = () => {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
+
+  const fetchSectionDetails = async (courseId) => {
+    try {
+      const response = await fetch(`http://localhost:8000/secciones/?curso=${courseId}`);
+      if (!response.ok) {
+        throw new Error("Error fetching section details");
+      }
+      const data = await response.json();
+      setCourseDetailsMap((prev) => ({ ...prev, [courseId]: data }));
+    } catch (error) {
+      console.error("Error fetching section details:", error);
+      showErrorTemporarily(
+        setError,
+        "Ocurrió un error al cargar los detalles de la sección."
+      );
+    }
+  };
 
   const sendPreferences = async () => {
     setErrorPreferences(null);
-  
-    // Estructura de los datos que se enviarán al backend
+
     const preferencesData = {
-      "cursos": selectedCourses.map((course) => course.id), // IDs de los cursos seleccionados
-      "permite_solapamiento": avoidTimeConflicts, // Evitar topes de horarios
-      "horarios_protegidos": protectedSchedules, // Horarios protegidos
-      "cursos_obligatorios": cursosObligatorios, // Cursos obligatorios
-      "minimo_n_cursos": minimoNCursos, // Mínimo de cursos
-      "max_n_creditos": maxNCreditos, // Máximo de créditos
+      cursos: selectedCourses.map((course) => course.id),
+      permite_solapamiento: avoidTimeConflicts,
+      horarios_protegidos: protectedSchedules,
+      cursos_obligatorios: cursosObligatorios,
+      minimo_n_cursos: minimoNCursos,
+      max_n_creditos: maxNCreditos,
     };
-  
-    // Depuración: Verifica que el objeto preferencesData esté correctamente estructurado
-    console.log("Datos enviados al backend:", preferencesData);
-  
-  
+
     try {
       const response = await schedulesApi(preferencesData);
-      console.log("Preferencias enviadas al backend:", response);
       dispatch(setSchedules(response.data));
       navigate("/");
     } catch (error) {
@@ -82,7 +93,7 @@ const SearchCourses = () => {
         "Ocurrió un error al enviar las preferencias. Inténtalo más tarde."
       );
     }
-  };  
+  };
 
   const validateSelectedCourses = (data) => {
     const validSelectedCourses = selectedCourses.filter((selectedCourse) =>
@@ -99,10 +110,21 @@ const SearchCourses = () => {
   };
 
   const handleCourseClick = (course) => {
-    if (selectedCourses.some((selected) => selected.url === course.url)) {
+    if (selectedCourses.some((selected) => selected.id === course.id)) {
       dispatch(removeCourse(course));
     } else {
       dispatch(addCourse(course));
+    }
+  };
+
+  const handleDetailsClick = (courseId) => {
+    if (expandedCourseId === courseId) {
+      setExpandedCourseId(null);
+    } else {
+      setExpandedCourseId(courseId);
+      if (!courseDetailsMap[courseId]) {
+        fetchSectionDetails(courseId);
+      }
     }
   };
 
@@ -118,7 +140,6 @@ const SearchCourses = () => {
     setProtectedSchedules(formattedProtectedSchedules);
   };
 
-  // Agregar o quitar cursos obligatorios
   const toggleObligatoryCourse = (courseId) => {
     setCursosObligatorios((prev) =>
       prev.includes(courseId)
@@ -141,25 +162,16 @@ const SearchCourses = () => {
           Gestionar Ramos (CRUD)
         </button>
       )}
-      
-      {error && (
-        <p className={`error-message ${error ? "" : "hidden"}`}>{error}</p>
-      )}
 
-      {errorPreferences && (
-        <p className={`error-message ${errorPreferences ? "" : "hidden"}`}>
-          {errorPreferences}
-        </p>
-      )}
+      {error && <p className="error-message">{error}</p>}
+      {errorPreferences && <p className="error-message">{errorPreferences}</p>}
 
       <button onClick={toggleView} className="toggle-view-button">
-        {showSelectedOnly
-          ? "Mostrar Todos los Ramos"
-          : "Mostrar Ramos Seleccionados"}
+        {showSelectedOnly ? "Mostrar Todos los Ramos" : "Mostrar Ramos Seleccionados"}
       </button>
-      <h6>1) Para seleccionar un ramo haga click en él</h6>
-      <h6>2) Luego haga click en "Mostrar Ramos Seleccionados"</h6>
-      <h6>3) Finalmente elija sus preferencias y haga click en "Enviar Preferencias"</h6>
+      <h6>1) Para seleccionar un ramo haga click en él.</h6>
+      <h6>2) Luego haga click en "Mostrar Ramos Seleccionados".</h6>
+      <h6>3) Finalmente elija sus preferencias y haga click en "Enviar Preferencias".</h6>
 
       {showSelectedOnly ? (
         <>
@@ -177,57 +189,76 @@ const SearchCourses = () => {
               <span className="toggle-label">Evitar topes de horarios</span>
             </label>
           </div>
-
           <div>
-            <label htmlFor="minimoNCursos">Mínimo de cursos:</label>
+            <label>Mínimo de cursos:</label>
             <input
               type="number"
-              id="minimoNCursos"
               value={minimoNCursos}
               onChange={(e) => setMinimoNCursos(Number(e.target.value))}
               min="1"
             />
           </div>
-
           <div>
-            <label htmlFor="maxNCreditos">Máximo de créditos:</label>
+            <label>Máximo de créditos:</label>
             <input
               type="number"
-              id="maxNCreditos"
               value={maxNCreditos}
               onChange={(e) => setMaxNCreditos(Number(e.target.value))}
               min="1"
             />
           </div>
-
           <div className="selected-courses">
             <h2>Ramos seleccionados:</h2>
-            {selectedCourses.length > 0 ? (
-              selectedCourses.map((course, index) => (
-                <div key={index} className="selected-course-item">
-                  <h3>{course.nombre}</h3>
-                  <p>Créditos: {course.creditos}</p>
-                  <button
-                    className="deselect-button"
-                    onClick={() => handleCourseClick(course)}
-                  >
-                    Deseleccionar
-                  </button>
-                  <button
-                    onClick={() => toggleObligatoryCourse(course.id)}
-                    className="obligatory-button"
-                  >
-                    {cursosObligatorios.includes(course.id)
-                      ? "Eliminar de obligatorios"
-                      : "Marcar como obligatorio"}
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p>No has seleccionado ningún ramo aún.</p>
-            )}
+            {selectedCourses.map((course) => (
+              <div
+                key={course.id}
+                className="selected-course-item"
+                onClick={() => handleCourseClick(course)}
+              >
+                <h3>{course.nombre}</h3>
+                <p>Créditos: {course.creditos}</p>
+                <button
+                  onClick={() => toggleObligatoryCourse(course.id)}
+                  className="obligatory-button"
+                >
+                  {cursosObligatorios.includes(course.id)
+                    ? "Eliminar de obligatorios"
+                    : "Marcar como obligatorio"}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDetailsClick(course.id);
+                  }}
+                  className="details-button"
+                >
+                  {expandedCourseId === course.id
+                    ? "Ocultar Detalles"
+                    : "Ver Detalles"}
+                </button>
+                {expandedCourseId === course.id && courseDetailsMap[course.id] && (
+                  <div className="course-details">
+                    {courseDetailsMap[course.id].map((section, index) => (
+                      <div key={index} className="section-details">
+                        <h4>Sección {index + 1}</h4>
+                        <p><strong>Especialidad:</strong> {section.especialidad}</p>
+                        <p><strong>Profesor:</strong> {section.nombre_profesor}</p>
+                        <p><strong>NRC:</strong> {section.nrc}</p>
+                        {section.bloques
+                          .filter((block) => block.tipo === "CLAS" || block.tipo === "AYUD")
+                          .map((block) => (
+                            <div key={block.id}>
+                              <p><strong>Sala:</strong> {block.sala}</p>
+                              <p><strong>Tipo:</strong> {block.tipo}</p>
+                            </div>
+                          ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-
           <ProtectedSchedule onScheduleChange={handleProtectedScheduleChange} />
         </>
       ) : (
@@ -239,34 +270,57 @@ const SearchCourses = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-bar"
           />
-
           {loading ? (
             <div className="loading-container">
-              <div className="spinner"></div>
               <p>Cargando cursos...</p>
             </div>
           ) : (
             <div className="courses-list">
-              {courses
-                .filter((course) =>
-                  course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-                .map((course) => (
-                  <div
-                    key={course.url}
-                    className={`course-item ${
-                      selectedCourses.some(
-                        (selected) => selected.url === course.url
-                      )
-                        ? "selected"
-                        : ""
-                    }`}
-                    onClick={() => handleCourseClick(course)}
+              {courses.map((course) => (
+                <div
+                  key={course.id}
+                  className={`course-item ${
+                    selectedCourses.some((selected) => selected.id === course.id)
+                      ? "selected"
+                      : ""
+                  }`}
+                  onClick={() => handleCourseClick(course)}
+                >
+                  <h3>{course.nombre}</h3>
+                  <p>Créditos: {course.creditos}</p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDetailsClick(course.id);
+                    }}
+                    className="details-button"
                   >
-                    <h3>{course.nombre}</h3>
-                    <p>Créditos: {course.creditos}</p>
-                  </div>
-                ))}
+                    {expandedCourseId === course.id
+                      ? "Ocultar Detalles"
+                      : "Ver Detalles"}
+                  </button>
+                  {expandedCourseId === course.id && courseDetailsMap[course.id] && (
+                    <div className="course-details">
+                      {courseDetailsMap[course.id].map((section, index) => (
+                        <div key={index} className="section-details">
+                          <h4>Sección {index + 1}</h4>
+                          <p><strong>Especialidad:</strong> {section.especialidad}</p>
+                          <p><strong>Profesor:</strong> {section.nombre_profesor}</p>
+                          <p><strong>NRC:</strong> {section.nrc}</p>
+                          {section.bloques
+                            .filter((block) => block.tipo === "CLAS" || block.tipo === "AYUD")
+                            .map((block) => (
+                              <div key={block.id}>
+                                <p><strong>Sala:</strong> {block.sala}</p>
+                                <p><strong>Tipo:</strong> {block.tipo}</p>
+                              </div>
+                            ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
