@@ -11,8 +11,9 @@ import Login from "./pages/login/Login";
 import UploadExcel from "./pages/upload_excel/UploadExcel";
 import CrudCurso from "./pages/CRUD_curso/crudCurso";
 import CrudSeccion from "./pages/CRUD_seccion/crudSeccion";
-import CrudProfesor from "./pages/CRUD_profesor/crudProfesor"
+import CrudProfesor from "./pages/CRUD_profesor/crudProfesor";
 import CrudBloque from "./pages/CRUD_bloque/crudBloque";
+import CourseDetails from "./pages/search_courses/CourseDetails"; // Importamos la nueva página de detalles
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
               <Route path="/crud-seccion" element={<CrudSeccion />} />
               <Route path="/crud-profesor" element={<CrudProfesor />} />
               <Route path="/crud-bloque" element={<CrudBloque />} />
+              <Route path="/course-details/:courseId" element={<CourseDetails />} />
             </Routes>
           </main>
           <Footer />

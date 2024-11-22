@@ -20,8 +20,6 @@ const SearchCourses = () => {
   const [minimoNCursos, setMinimoNCursos] = useState(2);
   const [maxNCreditos, setMaxNCreditos] = useState(30);
   const [cursosObligatorios, setCursosObligatorios] = useState([]);
-  const [expandedCourseId, setExpandedCourseId] = useState(null);
-  const [courseDetailsMap, setCourseDetailsMap] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,23 +50,6 @@ const SearchCourses = () => {
       setLoading(false);
     }
   }, []);
-
-  const fetchSectionDetails = async (courseId) => {
-    try {
-      const response = await fetch(`http://localhost:8000/secciones/?curso=${courseId}`);
-      if (!response.ok) {
-        throw new Error("Error fetching section details");
-      }
-      const data = await response.json();
-      setCourseDetailsMap((prev) => ({ ...prev, [courseId]: data }));
-    } catch (error) {
-      console.error("Error fetching section details:", error);
-      showErrorTemporarily(
-        setError,
-        "Ocurrió un error al cargar los detalles de la sección."
-      );
-    }
-  };
 
   const sendPreferences = async () => {
     setErrorPreferences(null);
@@ -117,17 +98,6 @@ const SearchCourses = () => {
     }
   };
 
-  const handleDetailsClick = (courseId) => {
-    if (expandedCourseId === courseId) {
-      setExpandedCourseId(null);
-    } else {
-      setExpandedCourseId(courseId);
-      if (!courseDetailsMap[courseId]) {
-        fetchSectionDetails(courseId);
-      }
-    }
-  };
-
   const toggleView = () => {
     setShowSelectedOnly((prev) => !prev);
   };
@@ -151,6 +121,11 @@ const SearchCourses = () => {
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
+
+  // Redirige a la página de detalles del curso
+  const handleDetailsClick = (courseId) => {
+    navigate(`/course-details/${courseId}`);
+  };
 
   return (
     <div className="course-selection">
@@ -225,37 +200,16 @@ const SearchCourses = () => {
                     ? "Eliminar de obligatorios"
                     : "Marcar como obligatorio"}
                 </button>
+                {/* Solo muestra el botón de detalles */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDetailsClick(course.id);
+                    handleDetailsClick(course.id); // Redirige a la nueva página de detalles
                   }}
                   className="details-button"
                 >
-                  {expandedCourseId === course.id
-                    ? "Ocultar Detalles"
-                    : "Ver Detalles"}
+                  Ver Detalles
                 </button>
-                {expandedCourseId === course.id && courseDetailsMap[course.id] && (
-                  <div className="course-details">
-                    {courseDetailsMap[course.id].map((section, index) => (
-                      <div key={index} className="section-details">
-                        <h4>Sección {index + 1}</h4>
-                        <p><strong>Especialidad:</strong> {section.especialidad}</p>
-                        <p><strong>Profesor:</strong> {section.nombre_profesor}</p>
-                        <p><strong>NRC:</strong> {section.nrc}</p>
-                        {section.bloques
-                          .filter((block) => block.tipo === "CLAS" || block.tipo === "AYUD")
-                          .map((block) => (
-                            <div key={block.id}>
-                              <p><strong>Sala:</strong> {block.sala}</p>
-                              <p><strong>Tipo:</strong> {block.tipo}</p>
-                            </div>
-                          ))}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -291,34 +245,12 @@ const SearchCourses = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDetailsClick(course.id);
+                      handleDetailsClick(course.id); // Redirige a la nueva página de detalles
                     }}
                     className="details-button"
                   >
-                    {expandedCourseId === course.id
-                      ? "Ocultar Detalles"
-                      : "Ver Detalles"}
+                    Ver Detalles
                   </button>
-                  {expandedCourseId === course.id && courseDetailsMap[course.id] && (
-                    <div className="course-details">
-                      {courseDetailsMap[course.id].map((section, index) => (
-                        <div key={index} className="section-details">
-                          <h4>Sección {index + 1}</h4>
-                          <p><strong>Especialidad:</strong> {section.especialidad}</p>
-                          <p><strong>Profesor:</strong> {section.nombre_profesor}</p>
-                          <p><strong>NRC:</strong> {section.nrc}</p>
-                          {section.bloques
-                            .filter((block) => block.tipo === "CLAS" || block.tipo === "AYUD")
-                            .map((block) => (
-                              <div key={block.id}>
-                                <p><strong>Sala:</strong> {block.sala}</p>
-                                <p><strong>Tipo:</strong> {block.tipo}</p>
-                              </div>
-                            ))}
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
