@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
+import html2canvas from "html2canvas"; // Importamos html2canvas
 import "./Home.css";
 
 // Crear una matriz de horarios
@@ -153,6 +154,27 @@ const Home = () => {
       </div>);
     });
   };
+  const renderCourseInfoForCSV = (daySchedule, slot) => {
+    const courses = daySchedule.filter((bloque) =>
+      isTimeWithinSlot(bloque.hora_inicio, bloque.hora_fin, slot.start, slot.end)
+    );
+  
+    if (courses.length === 0) {
+      return ""; // No hay cursos, devolver cadena vacía
+    }
+  
+    // En lugar de retornar JSX, retornamos una representación de texto con la información relevante
+    return courses.map((bloque) => {
+      const courseName = courseDetails[bloque.seccion]?.nombre_curso || "Sin Nombre";
+      const seccion = bloque.seccion || "Sin Sección";
+      const sala = bloque.sala || "Sin Sala";
+      const tipo = bloque.tipo || "Sin Tipo";
+  
+      // Crear una cadena con la información del curso
+      return `${courseName} (Sección: ${seccion}, Sala: ${sala}, Tipo: ${tipo})`;
+    }).join("; "); // Los cursos separados por un punto y coma
+  };
+  
 
   // Función para renderizar eventos especiales
   const renderSpecialEvents = () => (
@@ -178,11 +200,11 @@ const Home = () => {
     </div>
   );
 
+  const daysOfWeek = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+  weeklySchedule.forEach((bloque) => {
+    daysOfWeek[bloque.dia_semana].push(bloque);
+  });
   const renderSchedule = () => {
-    const daysOfWeek = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-    weeklySchedule.forEach((bloque) => {
-      daysOfWeek[bloque.dia_semana].push(bloque);
-    });
 
     return (
       <table className="schedule-table">
@@ -210,6 +232,40 @@ const Home = () => {
     );
   };
 
+  const convertScheduleToCSV = () => {
+    const header = ["Hora", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+    const rows = timeSlots.map((slot) => {
+      const row = [
+        `${slot.start} - ${slot.end}`,
+        ...[1, 2, 3, 4, 5].map((day) => renderCourseInfoForCSV(daysOfWeek[day], slot))
+      ];
+      return row.join(",");  // Une cada celda con coma
+    });
+  
+    return [header.join(","), ...rows].join("\n");  // Junta el header y las filas con saltos de línea
+  };  
+  
+  const downloadScheduleCSV = () => {
+    const csvData = convertScheduleToCSV();
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "horario.csv";  // Nombre del archivo a descargar
+    link.click();  // Simula el clic para iniciar la descarga
+  };
+
+    // Función para capturar el contenido y descargarlo como PNG
+    const downloadScheduleAsPNG = () => {
+      const element = document.getElementById("schedule-container"); // Seleccionamos el contenedor que queremos capturar
+      html2canvas(element).then((canvas) => {
+        // Creamos un enlace para descargar la imagen
+        const link = document.createElement("a");
+        link.download = "horario.png"; // Nombre del archivo de imagen
+        link.href = canvas.toDataURL("image/png"); // Convertimos el canvas a URL en formato PNG
+        link.click(); // Simulamos el clic para descargar la imagen
+      });
+    };  
+
   return (
     <div className="home-container">
       <h1>Horarios</h1>
@@ -222,7 +278,11 @@ const Home = () => {
       </select>
       {schedule && schedule.length > 0 ? (
         <>
-          {renderSchedule()}
+          <button onClick={downloadScheduleCSV}>Descargar horario (CSV)</button>
+          <button onClick={downloadScheduleAsPNG}>Descargar horario (PNG)</button>
+          <div id="schedule-container">
+            {renderSchedule()}
+          </div>
           {renderSpecialEvents()}
         </>
       ) : (
