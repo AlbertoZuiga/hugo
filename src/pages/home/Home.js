@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import "./Home.css";
 
@@ -34,20 +34,28 @@ const isTimeOverlap = (start1, end1, start2, end2) => {
   return start1Min < end2Min && start2Min < end1Min;
 };
 
-// Definimos las clases numéricas para los cursos
-const courseClassMapping = {};
-
 const Home = () => {
   const horarios = useSelector((state) => state.schedules.data);
   const [selectedSchedule, setSelectedSchedule] = useState(0); // Estado para el horario seleccionado
+  const [courseDetails, setCourseDetails] = useState({});
 
   // Maneja la selección de un horario
   const handleScheduleChange = (event) => {
     setSelectedSchedule(event.target.value);
   };
+  
 
   // Obtener el horario seleccionado si existe
-  const schedule = horarios && horarios.length > 0 ? horarios[selectedSchedule] : [];
+  const schedule = useMemo(() => {
+    return horarios && horarios.length > 0 ? horarios[selectedSchedule] : [];
+  }, [horarios, selectedSchedule]);
+
+  // Ordenar cursos por sección
+  const sortedCourses = useMemo(() => {
+    if (!schedule) return [];
+    const coursesInSchedule = schedule.map((bloque) => bloque.seccion || "Desconocido");
+    return Array.from(new Set(coursesInSchedule)).sort();
+  }, [schedule]);
 
   // Filtrar bloques de tipo CLAS, AYUD, LABT para el horario semanal
   const weeklySchedule = schedule.filter((bloque) =>
@@ -59,18 +67,6 @@ const Home = () => {
     (bloque) => !["CLAS", "AYUD", "LABT"].includes(bloque.tipo)
   );
 
-  // Función para asignar un color único a cada curso basado en su nombre
-  const getCourseColor = (courseName) => {
-    const hash = Array.from(courseName).reduce((hash, char) => {
-      return hash + char.charCodeAt(0);
-    }, 0);
-    const colors = [
-      "course-1", "course-2", "course-3", "course-4", 
-      "course-5", "course-6", "course-7"
-    ];
-    return colors[hash % colors.length]; // Asigna un color basado en el hash
-  };
-
   // Función para obtener la clase de tipo de clase (A, L, C)
   const getClassTypeClass = (tipo) => {
     if (tipo.startsWith("A")) {
@@ -80,7 +76,7 @@ const Home = () => {
     } else if (tipo.startsWith("C")) {
       return "type-C";
     }
-    return ""; // Si no es A, L o C
+    return "";
   };
 
   // Función para verificar si un curso está en el rango de un bloque de tiempo
@@ -98,27 +94,35 @@ const Home = () => {
     return courseStart < slotEndMin && courseEnd > slotStartMin;
   };
 
-  // Función para encontrar cursos que se superponen
-  const findOverlappingCourses = (courses) => {
-    const overlapping = [];
-    for (let i = 0; i < courses.length; i++) {
-      const bloque1 = courses[i];
-      for (let j = i + 1; j < courses.length; j++) {
-        const bloque2 = courses[j];
-        if (
-          isTimeOverlap(
-            bloque1.hora_inicio,
-            bloque1.hora_fin,
-            bloque2.hora_inicio,
-            bloque2.hora_fin
-          )
-        ) {
-          overlapping.push(bloque1.nrc, bloque2.nrc);
+  const fetchCourseDetails = async (seccion) => {
+    try {
+      const response = await fetch(`http://localhost:8000/secciones/${seccion}`);
+      if (!response.ok) throw new Error(`Error al buscar el curso: ${response.statusText}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error al obtener detalles del curso:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchAllCourseDetails = async () => {
+      const details = {};
+      for (const bloque of schedule) {
+        if (!details[bloque.seccion]) {
+          const data = await fetchCourseDetails(bloque.seccion);
+          if (data) {
+            details[bloque.seccion] = data;
+          }
         }
       }
-    }
-    return overlapping;
-  };
+      setCourseDetails(details);
+    };
+
+    fetchAllCourseDetails();
+  }, [schedule]);
+  
 
   // Función para renderizar la información de cada curso
   const renderCourseInfo = (daySchedule, slot) => {
@@ -127,62 +131,55 @@ const Home = () => {
     );
 
     if (courses.length === 0) {
-      return ""; // No hay cursos en este bloque de tiempo
+      return "";
     }
 
-    const overlappingCourses = findOverlappingCourses(courses);
+    console.log(courses[0])
 
     return courses.map((bloque, index) => {
-      const isOverlapping = overlappingCourses.includes(bloque.nrc);
-      const courseColorClass = getCourseColor(bloque.nombre_curso);
-      const courseTypeClass = getClassTypeClass(bloque.tipo);
+      const courseName = courseDetails[bloque.seccion]?.nombre_curso || "Sin Nombre";
 
-      return (
-        <div
-          key={index}
-          className={`${courseColorClass} ${courseTypeClass} ${isOverlapping ? "conflict" : ""}`}
-        >
-          <div className="course-name">{bloque.nombre_curso}</div>
-          <div className="course-nrc">NRC: {bloque.nrc}</div>
-          <div className="course-sala">Sala: {bloque.sala}</div>
-          <div className="course-tipo">{bloque.tipo}</div>
-        </div>
-      );
+      return(
+      <div
+        key={index}
+        className={`course course-${sortedCourses.indexOf(bloque.seccion) + 1} ${getClassTypeClass(
+          bloque.tipo
+        )}`}
+      >
+        <div className="course-name">{courseName || "Sin Nombre"}</div>
+        <div className="course-seccion">Sección: {bloque.seccion}</div>
+        <div className="course-sala">Sala: {bloque.sala}</div>
+        <div className="course-tipo">{bloque.tipo}</div>
+      </div>);
     });
   };
 
-  // Renderizar eventos especiales
-  const renderSpecialEvents = () => {
-    return (
-      <div className="special-events">
-        <h2>Eventos Especiales</h2>
-        {specialEvents.length > 0 ? (
-          specialEvents.map((evento, index) => (
-            <div key={index} className="event-item">
-              <h3>{evento.nombre_curso} (NRC: {evento.nrc})</h3>
-              <p><strong>Tipo:</strong> {evento.tipo}</p>
-              <p><strong>Fecha:</strong> {evento.fecha_inicio} - {evento.fecha_fin}</p>
-              <p><strong>Hora:</strong> {evento.hora_inicio} - {evento.hora_fin}</p>
-              <p><strong>Sala:</strong> {evento.sala}</p>
-            </div>
-          ))
-        ) : (
-          <p>No hay eventos especiales para mostrar.</p>
-        )}
-      </div>
-    );
-  };
+  // Función para renderizar eventos especiales
+  const renderSpecialEvents = () => (
+    <div className="special-events">
+      <h2>Eventos Especiales</h2>
+      {specialEvents.length > 0 ? (
+        specialEvents.map((evento, index) => (
+          <div key={index} className="event-item">
+            <h3>{evento.nombre_curso} (Sección: {evento.seccion})</h3>
+            <p><strong>Tipo:</strong> {evento.tipo}</p>
+            <p>
+              <strong>Fecha:</strong> {evento.fecha_inicio} - {evento.fecha_fin}
+            </p>
+            <p>
+              <strong>Hora:</strong> {evento.hora_inicio} - {evento.hora_fin}
+            </p>
+            <p><strong>Sala:</strong> {evento.sala}</p>
+          </div>
+        ))
+      ) : (
+        <p>No hay eventos especiales para mostrar.</p>
+      )}
+    </div>
+  );
 
   const renderSchedule = () => {
-    // Organizar los bloques por día de la semana
-    const daysOfWeek = {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-    };
-
+    const daysOfWeek = { 1: [], 2: [], 3: [], 4: [], 5: [] };
     weeklySchedule.forEach((bloque) => {
       daysOfWeek[bloque.dia_semana].push(bloque);
     });
@@ -200,14 +197,12 @@ const Home = () => {
           </tr>
         </thead>
         <tbody>
-          {timeSlots.map((slot, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>{`${slot.start} - ${slot.end}`}</td>
-              <td>{renderCourseInfo(daysOfWeek[1], slot)}</td>
-              <td>{renderCourseInfo(daysOfWeek[2], slot)}</td>
-              <td>{renderCourseInfo(daysOfWeek[3], slot)}</td>
-              <td>{renderCourseInfo(daysOfWeek[4], slot)}</td>
-              <td>{renderCourseInfo(daysOfWeek[5], slot)}</td>
+          {timeSlots.map((slot, index) => (
+            <tr key={index}>
+              <td>{slot.start} - {slot.end}</td>
+              {[1, 2, 3, 4, 5].map((day) => (
+                <td key={day}>{renderCourseInfo(daysOfWeek[day], slot)}</td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -216,31 +211,23 @@ const Home = () => {
   };
 
   return (
-    <div>
-      <h1>Horarios Generados</h1>
-      {/* Dropdown para seleccionar el horario */}
-      <label htmlFor="schedule-select">Selecciona un Horario:</label>
-      <select
-        id="schedule-select"
-        onChange={handleScheduleChange}
-        value={selectedSchedule}
-      >
-        {horarios.length > 0 ? (
-          horarios.map((_, index) => (
-            <option key={index} value={index}>
-              Horario {index + 1}
-            </option>
-          ))
-        ) : (
-          <option value="0">Horario vacío</option>
-        )}
+    <div className="home-container">
+      <h1>Horarios</h1>
+      <select onChange={handleScheduleChange} value={selectedSchedule}>
+        {horarios.map((horario, index) => (
+          <option key={index} value={index}>
+            {horario.nombre || `Horario ${index + 1}`}
+          </option>
+        ))}
       </select>
-
-      {/* Mostrar el horario semanal en formato tabla */}
-      {renderSchedule()}
-
-      {/* Mostrar eventos especiales */}
-      {renderSpecialEvents()}
+      {schedule && schedule.length > 0 ? (
+        <>
+          {renderSchedule()}
+          {renderSpecialEvents()}
+        </>
+      ) : (
+        <p>No hay horarios disponibles.</p>
+      )}
     </div>
   );
 };

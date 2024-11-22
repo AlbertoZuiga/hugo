@@ -137,17 +137,17 @@ const SearchCourses = () => {
           Gestionar Ramos (CRUD)
         </button>
       )}
-
+  
       {error && <p className="error-message">{error}</p>}
       {errorPreferences && <p className="error-message">{errorPreferences}</p>}
-
+  
       <button onClick={toggleView} className="toggle-view-button">
         {showSelectedOnly ? "Mostrar Todos los Ramos" : "Mostrar Ramos Seleccionados"}
       </button>
       <h6>1) Para seleccionar un ramo haga click en él.</h6>
       <h6>2) Luego haga click en "Mostrar Ramos Seleccionados".</h6>
       <h6>3) Finalmente elija sus preferencias y haga click en "Enviar Preferencias".</h6>
-
+  
       {showSelectedOnly ? (
         <>
           <button onClick={sendPreferences} className="toggle-view-button">
@@ -188,10 +188,16 @@ const SearchCourses = () => {
               <div
                 key={course.id}
                 className="selected-course-item"
-                onClick={() => handleCourseClick(course)}
               >
                 <h3>{course.nombre}</h3>
                 <p>Créditos: {course.creditos}</p>
+                {/* Botón para deseleccionar este curso */}
+                <button
+                  onClick={() => dispatch(removeCourse(course))}
+                  className="deselect-button"
+                >
+                  Deseleccionar
+                </button>
                 <button
                   onClick={() => toggleObligatoryCourse(course.id)}
                   className="obligatory-button"
@@ -200,11 +206,11 @@ const SearchCourses = () => {
                     ? "Eliminar de obligatorios"
                     : "Marcar como obligatorio"}
                 </button>
-                {/* Solo muestra el botón de detalles */}
+                {/* Botón para ver detalles */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDetailsClick(course.id); // Redirige a la nueva página de detalles
+                    handleDetailsClick(course.id);
                   }}
                   className="details-button"
                 >
@@ -245,7 +251,7 @@ const SearchCourses = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDetailsClick(course.id); // Redirige a la nueva página de detalles
+                      handleDetailsClick(course.id);
                     }}
                     className="details-button"
                   >
@@ -259,6 +265,7 @@ const SearchCourses = () => {
       )}
     </div>
   );
+  
 };
 
 export default SearchCourses;
