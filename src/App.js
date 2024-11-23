@@ -18,7 +18,7 @@ import CourseDetails from "./pages/search_courses/CourseDetails"; // Importamos 
 const App = () => {
   return (
     <Provider store={store}>
-      <Router>
+      <Router basename="/hugo-frontend">
         <div
           style={{
             display: "flex",
@@ -29,15 +29,15 @@ const App = () => {
           <Navbar />
           <main style={{ flex: "1" }}>
             <Routes>
-              <Route path="hugo-frontend/" element={<Home />} />
-              <Route path="hugo-frontend/search-courses" element={<SearchCourses />} />
-              <Route path="hugo-frontend/login" element={<Login />} />
-              <Route path="hugo-frontend/upload-excel" element={<UploadExcel />} />
-              <Route path="hugo-frontend/crud-curso" element={<CrudCurso />} />
-              <Route path="hugo-frontend/crud-seccion" element={<CrudSeccion />} />
-              <Route path="hugo-frontend/crud-profesor" element={<CrudProfesor />} />
-              <Route path="hugo-frontend/crud-bloque" element={<CrudBloque />} />
-              <Route path="hugo-frontend/course-details/:courseId" element={<CourseDetails />} />
+              <Route path="/" element={<Home />} />
+              <Route path="search-courses" element={<SearchCourses />} />
+              <Route path="login" element={<Login />} />
+              <Route path="upload-excel" element={<UploadExcel />} />
+              <Route path="crud-curso" element={<CrudCurso />} />
+              <Route path="crud-seccion" element={<CrudSeccion />} />
+              <Route path="crud-profesor" element={<CrudProfesor />} />
+              <Route path="crud-bloque" element={<CrudBloque />} />
+              <Route path="course-details/:courseId" element={<CourseDetails />} />
             </Routes>
           </main>
           <Footer />

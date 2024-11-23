@@ -11,7 +11,7 @@ const UploadExcel = () => {
   // Ensure redirection happens only once after mounting, not on every render
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate('login');
     }
   }, [isAuthenticated, navigate]);
 
