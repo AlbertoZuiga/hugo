@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import "./crudCurso.css";
 
-const API_URL = process.env.REACT_APP_API_URL;
 // Configurar el interceptor de Axios para agregar el token en cada solicitud
 axios.interceptors.request.use(
   (config) => {
@@ -44,8 +43,7 @@ const CrudCurso = () => {
 
   const fetchCourses = async () => {
     try {
-      
-      const response = await axios.get(`${API_URL}/cursos/`);
+      const response = await axios.get("${API_URL}/cursos/");
       setCourses(response.data);
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -60,8 +58,7 @@ const CrudCurso = () => {
   // Add a new course
   const handleAddCourse = async () => {
     try {
-      
-      await axios.post(`${API_URL}/cursos/`, formData);
+      await axios.post("${API_URL}/cursos/", formData);
       fetchCourses(); // Refresh list after adding
       resetForm();
     } catch (error) {
@@ -84,7 +81,6 @@ const CrudCurso = () => {
   // Delete a course
   const handleDeleteCourse = async (id) => {
     try {
-      
       await axios.delete(`${API_URL}/cursos/${id}/`);
       fetchCourses(); // Refresh list after deleting
     } catch (error) {

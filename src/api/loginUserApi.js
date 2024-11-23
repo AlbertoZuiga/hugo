@@ -2,8 +2,9 @@ import axios from 'axios';
 
 export const loginUserApi = async (username, password) => {
   try {
+    const API_URL = process.env.REACT_APP_API_URL;
     // Realizamos la petición POST al servidor
-    const response = await axios.post('http://localhost:8000/login/', {
+    const response = await axios.post(`${API_URL}/login/`, {
       username: username,
       password: password,
     });

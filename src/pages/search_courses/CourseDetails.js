@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./CourseDetails.css"; // Importamos el archivo de estilos
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CourseDetails = () => {
-  const { courseId } = useParams();  // Usamos useParams para obtener el ID del curso desde la URL
+  const { courseId } = useParams(); // Usamos useParams para obtener el ID del curso desde la URL
   const [courseDetails, setCourseDetails] = useState(null);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/secciones/?curso=${courseId}`);
+        const response = await fetch(`${API_URL}/secciones/?curso=${courseId}`);
         if (!response.ok) {
           throw new Error("Error fetching course details");
         }
@@ -33,14 +35,24 @@ const CourseDetails = () => {
       {courseDetails.map((section, index) => (
         <div key={index} className="section-container">
           <h3>Sección {index + 1}</h3>
-          <p><strong>Especialidad:</strong> {section.especialidad}</p>
-          <p><strong>Profesor:</strong> {section.nombre_profesor}</p>
-          <p><strong>NRC:</strong> {section.nrc}</p>
-          
+          <p>
+            <strong>Especialidad:</strong> {section.especialidad}
+          </p>
+          <p>
+            <strong>Profesor:</strong> {section.nombre_profesor}
+          </p>
+          <p>
+            <strong>NRC:</strong> {section.nrc}
+          </p>
+
           {section.bloques.map((block) => (
             <div key={block.id} className="block-container">
-              <p><strong>Tipo:</strong> {block.tipo}</p>
-              <p><strong>Sala:</strong> {block.sala}</p>
+              <p>
+                <strong>Tipo:</strong> {block.tipo}
+              </p>
+              <p>
+                <strong>Sala:</strong> {block.sala}
+              </p>
             </div>
           ))}
         </div>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import "./crudProfesor.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
 // Configurar el interceptor de Axios para agregar el token en cada solicitud
 axios.interceptors.request.use(
   (config) => {
@@ -41,7 +42,7 @@ const CrudProfesor = () => {
 
   const fetchProfessors = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/profesores/");
+      const response = await axios.get(`${API_URL}/profesores/`);
       setProfessors(response.data);
     } catch (error) {
       console.error("Error fetching professors:", error);
@@ -56,7 +57,7 @@ const CrudProfesor = () => {
   // Add a new professor
   const handleAddProfessor = async () => {
     try {
-      await axios.post("http://localhost:8000/profesores/", formData);
+      await axios.post(`${API_URL}/profesores/`, formData);
       fetchProfessors(); // Refresh list after adding
       resetForm();
     } catch (error) {
@@ -153,4 +154,3 @@ const CrudProfesor = () => {
 };
 
 export default CrudProfesor;
-

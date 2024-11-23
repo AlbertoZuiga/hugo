@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import "./crudSeccion.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
 // Configurar el interceptor de Axios para agregar el token en cada solicitud
 axios.interceptors.request.use(
   (config) => {
@@ -29,7 +30,7 @@ const CrudSeccion = () => {
   }, [isAuthenticated, navigate]);
 
   const [courses, setCourses] = useState([]);
-  console.log(courses)
+  console.log(courses);
   const [professors, setProfessors] = useState([]);
   const [sections, setSections] = useState([]);
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ const CrudSeccion = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/cursos/");
+      const response = await axios.get(`${API_URL}/cursos/`);
       setCourses(response.data);
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -57,7 +58,7 @@ const CrudSeccion = () => {
 
   const fetchProfessors = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/profesores/");
+      const response = await axios.get(`${API_URL}/profesores/`);
       setProfessors(response.data);
     } catch (error) {
       console.error("Error fetching professors:", error);
@@ -66,7 +67,7 @@ const CrudSeccion = () => {
 
   const fetchSections = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/secciones/");
+      const response = await axios.get(`${API_URL}/secciones/`);
       setSections(response.data);
     } catch (error) {
       console.error("Error fetching sections:", error);
@@ -78,10 +79,7 @@ const CrudSeccion = () => {
   };
 
   const handleAddSection = async () => {
-    console.log(
-      "URL Profesor:",
-      `http://localhost:8000/profesores/${formData.profesor}/`
-    );
+    console.log("URL Profesor:", `${API_URL}/profesores/${formData.profesor}/`);
 
     try {
       // Construir URLs completas para profesor y curso
@@ -98,7 +96,7 @@ const CrudSeccion = () => {
       };
 
       console.log("Datos enviados:", dataToSend); // Depuración
-      await axios.post("http://localhost:8000/secciones/", dataToSend);
+      await axios.post(`${API_URL}/secciones/`, dataToSend);
       fetchSections();
       resetForm();
     } catch (error) {
@@ -121,10 +119,10 @@ const CrudSeccion = () => {
       const dataToSend = {
         nrc,
         profesor,
-        curso: `http://localhost:8000/cursos/${curso}/`,
+        curso: `${API_URL}/cursos/${curso}/`,
       };
 
-      await axios.put(`http://localhost:8000/secciones/${nrc}/`, dataToSend, {
+      await axios.put(`${API_URL}/secciones/${nrc}/`, dataToSend, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "multipart/form-data",
@@ -140,7 +138,7 @@ const CrudSeccion = () => {
 
   const handleDeleteSection = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/secciones/${id}/`, {
+      await axios.delete(`${API_URL}/secciones/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
           "Content-Type": "multipart/form-data",
@@ -165,7 +163,7 @@ const CrudSeccion = () => {
     const professor = professors.find((prof) => prof.id === professorId);
     return professor ? professor.nombre : "Desconocido";
   };
-  
+
   const getCourseName = (courseId) => {
     const course = courses.find((course) => course.id === courseId);
     return course ? course.nombre : "Desconocido";

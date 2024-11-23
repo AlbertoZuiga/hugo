@@ -97,7 +97,8 @@ const Home = () => {
 
   const fetchCourseDetails = async (seccion) => {
     try {
-      const response = await fetch(`http://localhost:8000/secciones/${seccion}`);
+      const API_URL = process.env.REACT_APP_API_URL;
+      const response = await fetch(`${API_URL}/secciones/${seccion}`);
       if (!response.ok) throw new Error(`Error al buscar el curso: ${response.statusText}`);
       const data = await response.json();
       return data;

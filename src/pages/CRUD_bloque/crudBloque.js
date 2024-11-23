@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./crudBloque.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CrudBloque = () => {
   const [formData, setFormData] = useState({
     dia_semana: "",
@@ -24,7 +26,8 @@ const CrudBloque = () => {
   const fetchSecciones = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.get("http://localhost:8000/secciones/", {
+      const API_URL = process.env.REACT_APP_API_URL;
+      const response = await axios.get(`${API_URL}/secciones/`, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -72,7 +75,7 @@ const CrudBloque = () => {
         fecha_fin: formatDateForBackend(formData.fecha_fin),
       };
 
-      const response = await axios.post("http://localhost:8000/bloques/", dataToSend, { headers });
+      const response = await axios.post(`${API_URL}/bloques/`, dataToSend, { headers });
       setResponseMessage("Bloque creado exitosamente.");
       console.log("Respuesta del servidor:", response.data);
       setFormData({
