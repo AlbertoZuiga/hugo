@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/hugo/static/css/main.3053d1dc.css",
-    "main.js": "/hugo/static/js/main.87bc074e.js",
-    "static/js/453.ea535d1f.chunk.js": "/hugo/static/js/453.ea535d1f.chunk.js",
-    "index.html": "/hugo/index.html",
-    "main.3053d1dc.css.map": "/hugo/static/css/main.3053d1dc.css.map",
-    "main.87bc074e.js.map": "/hugo/static/js/main.87bc074e.js.map",
-    "453.ea535d1f.chunk.js.map": "/hugo/static/js/453.ea535d1f.chunk.js.map"
+    "main.css": "/hugo-frontend/static/css/main.3053d1dc.css",
+    "main.js": "/hugo-frontend/static/js/main.eb7a1bfa.js",
+    "static/js/453.ea535d1f.chunk.js": "/hugo-frontend/static/js/453.ea535d1f.chunk.js",
+    "index.html": "/hugo-frontend/index.html",
+    "main.3053d1dc.css.map": "/hugo-frontend/static/css/main.3053d1dc.css.map",
+    "main.eb7a1bfa.js.map": "/hugo-frontend/static/js/main.eb7a1bfa.js.map",
+    "453.ea535d1f.chunk.js.map": "/hugo-frontend/static/js/453.ea535d1f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3053d1dc.css",
-    "static/js/main.87bc074e.js"
+    "static/js/main.eb7a1bfa.js"
   ]
 }
