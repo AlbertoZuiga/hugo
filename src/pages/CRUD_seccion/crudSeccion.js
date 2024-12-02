@@ -252,8 +252,8 @@ const CrudSeccion = () => {
                   onClick={() => {
                     setFormData({
                       nrc: section.nrc,
-                      profesor: section.profesor.split("/").slice(-2, -1)[0],
-                      curso: section.curso.split("/").slice(-2, -1)[0],
+                      profesor: section.profesor,
+                      curso: section.curso,
                     });
                     setEditMode(true);
                   }}

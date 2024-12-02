@@ -56,7 +56,7 @@ const SearchCourses = () => {
 
     const preferencesData = {
       cursos: selectedCourses.map((course) => course.id),
-      permite_solapamiento: avoidTimeConflicts,
+      permite_solapamiento: !avoidTimeConflicts,
       horarios_protegidos: protectedSchedules,
       cursos_obligatorios: cursosObligatorios,
       minimo_n_cursos: minimoNCursos,
@@ -236,29 +236,33 @@ const SearchCourses = () => {
             </div>
           ) : (
             <div className="courses-list">
-              {courses.map((course) => (
-                <div
-                  key={course.id}
-                  className={`course-item ${
-                    selectedCourses.some((selected) => selected.id === course.id)
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() => handleCourseClick(course)}
-                >
-                  <h3>{course.nombre}</h3>
-                  <p>Créditos: {course.creditos}</p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDetailsClick(course.id);
-                    }}
-                    className="details-button"
+              {courses
+                .filter((course) =>
+                  course.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((course) => (
+                  <div
+                    key={course.id}
+                    className={`course-item ${
+                      selectedCourses.some((selected) => selected.id === course.id)
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() => handleCourseClick(course)}
                   >
-                    Ver Detalles
-                  </button>
-                </div>
-              ))}
+                    <h3>{course.nombre}</h3>
+                    <p>Créditos: {course.creditos}</p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetailsClick(course.id);
+                      }}
+                      className="details-button"
+                    >
+                      Ver Detalles
+                    </button>
+                  </div>
+                ))}
             </div>
           )}
         </div>
